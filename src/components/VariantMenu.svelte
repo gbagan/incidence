@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Variant } from "../types";
   import Logo from "./Logo.svelte";
+  import Wrap from "./Wrap.svelte";
 
   type Props = {
     select: (variant: Variant) => void;
@@ -9,7 +10,7 @@
   let { select }: Props = $props();
 </script>
 
-<div class="wrap">
+<Wrap>
   <main class="center-card">
     <Logo />
 
@@ -47,4 +48,4 @@
         </li>
       </ul>
   </aside>
-</div>
+</Wrap>

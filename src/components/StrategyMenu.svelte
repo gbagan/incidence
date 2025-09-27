@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Strategy, Variant } from "../types";
   import Logo from "./Logo.svelte";
+  import Wrap from "./Wrap.svelte";
 
   type Props = {
     variant: Variant;
@@ -10,7 +11,7 @@
   let { select, variant }: Props = $props();
 </script>
 
-<div class="wrap">
+<Wrap>
   <main class="center-card">
     <Logo />
 
@@ -43,4 +44,4 @@
         des classes de graphes comme les chemins ou cycles.</p>
     {/if}
   </aside>
-</div>
+</Wrap>

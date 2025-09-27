@@ -2,6 +2,7 @@
   import type { Edge, Graph, Strategy } from "../types";
   import { countBy, delay, generate, generate2, randomPick, repeat } from "../util";
   import Logo from "./Logo.svelte";
+  import Wrap from "./Wrap.svelte";
 
   type Props = { graph: Graph; strategy: Strategy };
 
@@ -171,7 +172,7 @@
   />
 {/snippet}
 
-<div class="wrap">
+<Wrap>
   <main class="center-card">
     <Logo/>
 
@@ -242,13 +243,12 @@
     </div>
   </main>
 
-
   <aside class="info">
     <h3>À propos du plateau</h3>
     <p>Blah blah blah Blah blah blah Blah blah blah Blah blah blahBlah blah blah
     </p>
   </aside>
-</div>
+</Wrap>
 
 <style>
   .board-wrap {
