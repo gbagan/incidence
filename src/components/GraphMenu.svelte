@@ -23,6 +23,7 @@
       <div class="buttons">
         <button class="btn btn1" onclick={() => select("cycle")}>Cycle</button>
         <button class="btn btn2" onclick={() => select("grid")}>Grille</button>
+        <button class="btn btn3" onclick={() => select("triangle")}>Grille triangulaire</button>
       </div>
     </section>
   </main>

@@ -22,6 +22,7 @@
     switch (graph) {
       case "cycle": return 20;
       case "grid": return 64;
+      case "triangle": return 80;
     }
   });
 
@@ -34,18 +35,31 @@
           const y = CENTER.y + Math.sin(angle)*RADIUS;
           return { x, y };
         });
-      default:
+      case "grid":
         return generate2(8, 8, (row, col) => ({x: 20 + 80 * col, y: 20 + 80 * row}));
+      case "triangle":
+        const h = Math.sqrt(3) / 2;
+        return generate2(10, 8, (row, col) => ({x: (row % 2 === 0 ? 20 : 55) + 70 * col, y: 20 + 70 * h * row}));
     }
   })
 
   const edges: [number, number][] = $derived.by(() => {
     switch (graph) {
       case "cycle": return generate(nodeCount, i => [i, (i+1) % nodeCount]);
-      default: return [
-        ...generate2(8, 7, (i, j) => [i * 8 + j, i * 8 + j + 1] as Edge),
-        ...generate2(7, 8, (i, j) => [i * 8 + j, i * 8 + j + 8] as Edge)
+      case "grid": return [
+        ...generate2(8, 7, (i, j) => [8 * i + j, 8 * i + j + 1] as Edge),
+        ...generate2(7, 8, (i, j) => [8 * i + j, 8 * i + j + 8] as Edge)
       ];
+      case "triangle": return [
+        ...generate2(10, 7, (i, j) => [8 * i + j, 8 * i + j + 1] as Edge),
+        ...generate2(9, 8, (i, j) => [8 * i + j, 8 * i + j + 8] as Edge),
+        ...generate2(9, 7, (i, j) =>
+          i % 2 === 0 
+          ? [8 * i + j + 1, 8 * i + j + 8] as Edge
+          : [8 * i + j, 8 * i + j + 9] as Edge
+        )
+      ];
+      default: return [];
     }
   })
 
