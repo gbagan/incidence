@@ -72,7 +72,6 @@
       return null;
     }
     const n = nodeCount;
-    console.log(nodeCount);
     const table = repeat(n, -Infinity);
     for (let i = 0; i < n; i++) {
       if (position[i] === 0) {
