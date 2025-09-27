@@ -1,12 +1,16 @@
 <script lang="ts">
   import type { Edge, Graph, Strategy } from "../types";
-  import { countBy, delay, generate, generate2, randomPick, repeat } from "../util";
+  import { countBy, delay, generate, generate2, randomPick, range, repeat } from "../util";
   import Logo from "./Logo.svelte";
   import Wrap from "./Wrap.svelte";
 
-  type Props = { graph: Graph; strategy: Strategy };
+  type Props = {
+    graph: Graph;
+    strategy: Strategy;
+    back: () => void
+  };
 
-  let { graph, strategy }: Props = $props();
+  let { graph, strategy, back }: Props = $props();
 
   const RADIUS = 250;
   const CENTER = { x: 300, y: 300 };
@@ -87,9 +91,10 @@
   });
 
   function computerMove(prevMove: number): number | null {
+    const n = position.length;
     switch (strategy) {
       case "random":
-        return randomPick(position.filter(x => x === 0));
+        return randomPick(range(0, n).filter(i => position[i] === 0));
       case "erdos":
         if (erdosTable === null) {
           return null;
@@ -110,7 +115,7 @@
             return u;
           }
         }
-        return randomPick(position.filter(x => x === 0));
+        return randomPick(range(0, n).filter(i => position[i] === 0));
     }
   }
 
@@ -175,6 +180,9 @@
 <Wrap>
   <main class="center-card">
     <Logo/>
+    <div class="backbutton">
+      <button class="btn btn3" onclick={back}>Retour</button>
+    </div>
 
     <div class="board-wrap">
       <div class="scores">
@@ -230,7 +238,7 @@
             cy={y}
             r="16"
             stroke="#9ca3af"
-            stroke-width="3"
+            class="nonplayed"
             onclick={() => play(i)}
           />
           {#if position[i] === 1}
@@ -293,6 +301,11 @@
   .edge.player2 {
     stroke: #22c55e;
     stroke-width: 5;
+  }
+
+  .nonplayed {
+    cursor: pointer;
+    stroke-width: 3;
   }
 
   .pair {

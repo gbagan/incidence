@@ -3,7 +3,7 @@
   import VariantMenu from "./components/VariantMenu.svelte";
   import Game from "./components/Game.svelte";
   import GraphMenu from "./components/GraphMenu.svelte";
-    import StrategyMenu from "./components/StrategyMenu.svelte";
+  import StrategyMenu from "./components/StrategyMenu.svelte";
   
   let variant: Variant | null = $state(null);
   let graph: Graph | null = $state(null);
@@ -17,5 +17,5 @@
 {:else if graph === null}
   <GraphMenu {variant} select={g => graph = g} />
 {:else}
-  <Game {graph} {strategy} />
+  <Game {graph} {strategy} back={() => graph = null} />
 {/if}

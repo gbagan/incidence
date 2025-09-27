@@ -20,29 +20,9 @@ html,body{
   font-size: 2vmin;
 }
 
-@media (max-width:920px) {
-  .wrap{
-    grid-template-columns: 1fr;
-    padding: 2rem;
-  }
-}
-
-  .wrap{
-    min-height:100vh;
-    display:grid;
-    grid-template-columns:1fr 420px;
-    align-items:center;
-    gap: 2.5rem;
-    padding: 3rem;
-  }
-  @media (max-width:920px) {
-    .wrap{
-      grid-template-columns:1fr;
-      padding: 2rem;
-    }
-  }
-
   .center-card {
+    position: relative;
+    min-width: 20rem;
     max-width: 60rem;
     margin:0 auto;
     background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
@@ -53,6 +33,12 @@ html,body{
     gap: 2rem;
     align-items:center;
     justify-content:center
+  }
+
+  .backbutton {
+    position: absolute;
+    left: 2rem;
+    bottom: 2rem;
   }
 
   .menu{

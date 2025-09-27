@@ -12,6 +12,21 @@ export function generate<A>(n: number, f: (i: number) => A): A[] {
   return res;
 }
 
+export function range(start: number, end: number, step?: number): number[] {
+  const res = [];
+  step = step ?? 1;
+  if (step > 0) {
+    for (let i = start; i < end; i += step) {
+      res.push(i);
+    }
+  } else {
+    for (let i = start; i > end; i += step) {
+      res.push(i);
+    }
+  }
+  return res
+}
+
 export function countBy<A>(arr: A[], pred: (x: A, i: number) => boolean): number {
   let count = 0;
   const n = arr.length;
