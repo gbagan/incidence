@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { Graph, Variant } from "../types";
+  import type { Strategy, Variant } from "../types";
   import Logo from "./Logo.svelte";
 
   type Props = {
     variant: Variant;
-    select: (graph: Graph) => void;
+    select: (strat: Strategy) => void;
   }
 
   let { select, variant }: Props = $props();
@@ -16,12 +16,13 @@
 
     <section class="menu">
       <p class="desc">
-        Choisis le type de graphes. Le dernier type est un hypergraphe.
+        Choisis la stratégie de l'adversaire.
       </p>
 
       <div class="buttons">
-        <button class="btn btn1" onclick={() => select("cycle")}>Cycle</button>
-        <button class="btn btn2" onclick={() => select("grid")}>Grille</button>
+        <button class="btn btn1" onclick={() => select("random")}>Aléatoire</button>
+        <button class="btn btn2" onclick={() => select("erdos")}>Erdős-Selfridge</button>
+        <button class="btn btn3" onclick={() => select("pairing")}>Pairing</button>
       </div>
     </section>
   </main>

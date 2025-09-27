@@ -27,3 +27,11 @@ export const generate2 = <A>(n: number,  m: number, f: (i: number, j: number) =>
   generate(n * m, i => f(i / m | 0, i % m));
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+
+export function randomPick<A>(arr: A[]): A | null {
+  if (arr.length === 0) {
+    return null;
+  } else {
+    return arr[Math.random() * arr.length | 0];
+  }
+}

@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { Edge, Graph, Strategy } from "../types";
-  import { countBy, delay, generate, generate2, repeat } from "../util";
+  import { countBy, delay, generate, generate2, randomPick, repeat } from "../util";
   import Logo from "./Logo.svelte";
 
   type Props = { graph: Graph; strategy: Strategy };
@@ -10,10 +10,10 @@
   const RADIUS = 250;
   const CENTER = { x: 300, y: 300 };
 
-  let turn: 1 | 2 = $state(1);
+  //let turn: 1 | 2 = $state(1);
   let showStrat = $state(false);
 
-  let node_count = $derived.by(() => {
+  let nodeCount = $derived.by(() => {
     switch (graph) {
       case "cycle": return 20;
       case "grid": return 64;
@@ -23,20 +23,20 @@
   let nodes: {x: number, y: number}[] = $derived.by(() => {
     switch (graph) {
       case "cycle":
-          return generate(node_count, i => {
-            const angle = 2 * Math.PI * i / node_count - Math.PI/2; // start top
-            const x = CENTER.x + Math.cos(angle)*RADIUS;
-            const y = CENTER.y + Math.sin(angle)*RADIUS;
-            return { x, y };
-          });
+        return generate(nodeCount, i => {
+          const angle = 2 * Math.PI * i / nodeCount - Math.PI/2; // start top
+          const x = CENTER.x + Math.cos(angle)*RADIUS;
+          const y = CENTER.y + Math.sin(angle)*RADIUS;
+          return { x, y };
+        });
       default:
-         return generate2(8, 8, (row, col) => ({x: 20 + 80 * col, y: 20 + 80 * row}));
+        return generate2(8, 8, (row, col) => ({x: 20 + 80 * col, y: 20 + 80 * row}));
     }
   })
 
   const edges: [number, number][] = $derived.by(() => {
     switch (graph) {
-      case "cycle": return generate(node_count, i => [i, (i+1) % node_count]);
+      case "cycle": return generate(nodeCount, i => [i, (i+1) % nodeCount]);
       default: return [
         ...generate2(8, 7, (i, j) => [i * 8 + j, i * 8 + j + 1] as Edge),
         ...generate2(7, 8, (i, j) => [i * 8 + j, i * 8 + j + 8] as Edge)
@@ -44,25 +44,86 @@
     }
   })
 
-  let position = $state(repeat(20, 0));
+  let position = $derived(repeat(nodeCount, 0));
 
   let score1 = $derived(countBy(edges, ([u, v]) => position[u] === 1 && position[v] === 1));
   let score2 = $derived(countBy(edges, ([u, v]) => position[u] === 2 && position[v] === 2));
  
   let pairing = $derived(
     graph === "cycle" && strategy === "pairing" 
-    ? generate(node_count >> 1, i => [2*i, 2*i+1])
+    ? generate(nodeCount >> 1, i => [2*i, 2*i+1])
     : null
   );
 
+  function erdosSelfridge(position: number[]): number {
+    let score = 0;
+    for (const [u, v] of edges) {
+      if (position[u] === 1 && position[v] === 1) {
+        score += 2;
+      } else if (position[u] === 1 && position[v] === 0 || position[u] === 0 && position[v] === 1) {
+        score += 0.5;
+      }
+    }
+    return score;
+  }
+
+  let erdosTable = $derived.by(() => {
+    if (strategy !== "erdos") {
+      return null;
+    }
+    const n = nodeCount;
+    console.log(nodeCount);
+    const table = repeat(n, -Infinity);
+    for (let i = 0; i < n; i++) {
+      if (position[i] === 0) {
+        table[i] = erdosSelfridge(position.with(i, 1));
+      }
+    }
+
+    const min = Math.min(...table.filter(x => x !== -Infinity));
+    const max = Math.max(...table);
+
+    return table.map(x => x === -Infinity ? -Infinity : min === max ? 0 : (x - min) / (max - min));
+  });
+
+  function computerMove(prevMove: number): number | null {
+    switch (strategy) {
+      case "random":
+        return randomPick(position.filter(x => x === 0));
+      case "erdos":
+        if (erdosTable === null) {
+          return null;
+        }
+        let max = Math.max(...erdosTable);
+        if (max === -Infinity) {
+          return null;
+        }
+        return erdosTable.indexOf(max);
+      case "pairing":
+        if (pairing === null) {
+          return null;
+        }
+        for (const [u, v] of pairing) {
+          if (prevMove === u) {
+            return v;
+          } else if (prevMove === v) {
+            return u;
+          }
+        }
+        return randomPick(position.filter(x => x === 0));
+    }
+  }
 
   async function play(i: number) {
-    position[i] = 1;
+    position = position.with(i, 1);
     //turn = turn === 1 ? 2 : 1;
     showStrat = true;
     await delay(1000);
     showStrat = false;
-    position[i ^ 1] = 2;
+    let move = computerMove(i);
+    if (move !== null) {
+      position = position.with(move, 2);
+    }
   }
 
   function pairPath(x: number, y: number, w: number, h: number, r: number){
@@ -99,6 +160,15 @@
     {d}
     class={["pair", {visible}]}
     style:transform="translate({midX}px, {midY}px) rotate({angle}deg)"
+  />
+{/snippet}
+
+
+{#snippet erdosSquare(x: number, y: number, score: number, visible: boolean)}
+  <rect
+    style:transform="translate({x}px, {y}px)"
+    class={["erdos", {visible}]}
+    fill="rgb(255,{255 * (1 - score)},0)"
   />
 {/snippet}
 
@@ -144,6 +214,12 @@
         {#if pairing !== null}
           {#each pairing as [u, v]}
             {@render pair(u, v, showStrat)}
+          {/each}
+        {/if}
+        {#if erdosTable !== null}
+          {#each erdosTable as score, i}
+            {@const {x, y} = nodes[i] }
+            {@render erdosSquare(x, y, score, showStrat)}
           {/each}
         {/if}
         {#each nodes as {x, y}, i}
@@ -228,6 +304,20 @@
     transition: opacity 500ms;
     &.visible {
       opacity: 1;
+    }
+  }
+
+  .erdos {
+    x: -30px;
+    y: -30px;
+    width: 60px;
+    height: 60px;
+    rx: 10px;
+    ry: 10px;
+    opacity: 0;
+    transition: opacity 500ms;
+    &.visible {
+      opacity: 0.5;
     }
   }
 </style>

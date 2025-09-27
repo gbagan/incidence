@@ -33,7 +33,7 @@
         Elle consiste à choisir un sommet de degré maximal parmi les sommets non déjà choisis.
       </p>
       <p>
-        En particulier, la version Maker-Maker sur un graphe régulier finit par un match nul.
+        En particulier, la version Maker-Maker sur un graphe régulier d'ordre pair finit toujours par un match nul.
       </p>
       <p>Le résultat n'est plus vrai sur les hypergraphes, le problème étant PSPACE-complet.</p>
     {:else}
