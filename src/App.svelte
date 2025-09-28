@@ -13,9 +13,9 @@
 {#if variant === null}
   <VariantMenu select={v => variant = v} />
 {:else if strategy === null}
-  <StrategyMenu {variant} select={s => strategy = s} />
+  <StrategyMenu {variant} select={s => strategy = s} back={() => variant = null} />
 {:else if graph === null}
-  <GraphMenu {variant} select={g => graph = g} />
+  <GraphMenu {variant} {strategy} select={g => graph = g} back={() => strategy = null} />
 {:else}
-  <Game {graph} {strategy} back={() => graph = null} />
+  <Game {variant} {graph} {strategy} back={() => graph = null} />
 {/if}

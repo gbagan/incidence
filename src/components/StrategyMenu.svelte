@@ -6,15 +6,18 @@
   type Props = {
     variant: Variant;
     select: (strat: Strategy) => void;
+    back: () => void;
   }
 
-  let { select, variant }: Props = $props();
+  let { select, variant, back }: Props = $props();
 </script>
 
 <Wrap>
   <main class="center-card">
-    <Logo />
-
+    <div class="logo-container">
+      <Logo />
+      <button class="btn btn3" onclick={back}>Retour</button>
+    </div>
     <section class="menu">
       <p class="desc">
         Choisis la stratégie de l'adversaire.

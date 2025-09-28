@@ -1,19 +1,17 @@
 <script lang="ts">
-  import type { Edge, Graph, Strategy } from "../types";
+  import type { Edge, Graph, Strategy, Variant } from "../types";
   import { countBy, delay, generate, generate2, randomPick, range, repeat } from "../util";
   import Logo from "./Logo.svelte";
   import Wrap from "./Wrap.svelte";
 
   type Props = {
+    variant: Variant;
     graph: Graph;
     strategy: Strategy;
     back: () => void
   };
 
-  let { graph, strategy, back }: Props = $props();
-
-  const RADIUS = 250;
-  const CENTER = { x: 300, y: 300 };
+  let { variant, graph, strategy, back }: Props = $props();
 
   //let turn: 1 | 2 = $state(1);
   let showStrat = $state(false);
@@ -23,6 +21,7 @@
       case "cycle": return 20;
       case "grid": return 64;
       case "triangle": return 80;
+      case "hypergraph": return 80;
     }
   });
 
@@ -31,13 +30,14 @@
       case "cycle":
         return generate(nodeCount, i => {
           const angle = 2 * Math.PI * i / nodeCount - Math.PI/2; // start top
-          const x = CENTER.x + Math.cos(angle)*RADIUS;
-          const y = CENTER.y + Math.sin(angle)*RADIUS;
+          const x = 300 + 250 * Math.cos(angle);
+          const y = 300 + 250 * Math.sin(angle);
           return { x, y };
         });
       case "grid":
-        return generate2(8, 8, (row, col) => ({x: 20 + 80 * col, y: 20 + 80 * row}));
+        return generate2(8, 8, (row, col) => ({x: 40 + 75 * col, y: 40 + 75 * row}));
       case "triangle":
+      case "hypergraph":
         const h = Math.sqrt(3) / 2;
         return generate2(10, 8, (row, col) => ({x: (row % 2 === 0 ? 20 : 55) + 70 * col, y: 20 + 70 * h * row}));
     }
@@ -50,7 +50,9 @@
         ...generate2(8, 7, (i, j) => [8 * i + j, 8 * i + j + 1] as Edge),
         ...generate2(7, 8, (i, j) => [8 * i + j, 8 * i + j + 8] as Edge)
       ];
-      case "triangle": return [
+      case "triangle":
+      case "hypergraph":
+        return [
         ...generate2(10, 7, (i, j) => [8 * i + j, 8 * i + j + 1] as Edge),
         ...generate2(9, 8, (i, j) => [8 * i + j, 8 * i + j + 8] as Edge),
         ...generate2(9, 7, (i, j) =>
@@ -59,14 +61,38 @@
           : [8 * i + j, 8 * i + j + 9] as Edge
         )
       ];
-      default: return [];
     }
+  })
+
+    const wsets: number[][] = $derived.by(() => {
+      if (graph !== "hypergraph") {
+        return edges;
+      } else {
+        const sets: number[][] = [];
+        for (let i = 0; i < 9; i++) {
+          for (let j = 0; j < 7; j++) {
+            const a = 8 * i + j;
+            const b = a + 1;
+            const c = 8 * (i + 1) + j + i % 2;
+            sets.push([a, b, c]);
+          }
+        }
+        for (let i = 1; i < 10; i++) {
+          for (let j = 0; j < 7; j++) {
+            const a = 8 * i + j;
+            const b = a + 1;
+            const c = a - 8 + i % 2;
+            sets.push([a, b, c]);
+          }
+        }
+        return sets;
+      }
   })
 
   let position = $derived(repeat(nodeCount, 0));
 
-  let score1 = $derived(countBy(edges, ([u, v]) => position[u] === 1 && position[v] === 1));
-  let score2 = $derived(countBy(edges, ([u, v]) => position[u] === 2 && position[v] === 2));
+  let score1 = $derived(countBy(wsets, (set => set.every(x => position[x] === 1))));
+  let score2 = $derived(countBy(wsets, (set => set.every(x => position[x] === 2))));
  
   let pairing = $derived(
     graph === "cycle" && strategy === "pairing" 
@@ -76,17 +102,16 @@
 
   function erdosSelfridge(position: number[]): number {
     let score = 0;
-    for (const [u, v] of edges) {
-      if (position[u] === 1 && position[v] === 1) {
-        score += 2;
-      } else if (position[u] === 1 && position[v] === 0 || position[u] === 0 && position[v] === 1) {
-        score += 0.5;
+    for (const set of wsets) {
+      if (set.every(x => position[x] !== 2)) {
+        const c = countBy(set, x => position[x] === 0);
+        score += 1 / (4 ** c);
       }
     }
     return score;
   }
 
-  let erdosTable = $derived.by(() => {
+  let erdosScores = $derived.by(() => {
     if (strategy !== "erdos") {
       return null;
     }
@@ -110,14 +135,14 @@
       case "random":
         return randomPick(range(0, n).filter(i => position[i] === 0));
       case "erdos":
-        if (erdosTable === null) {
+        if (erdosScores === null) {
           return null;
         }
-        let max = Math.max(...erdosTable);
+        let max = Math.max(...erdosScores);
         if (max === -Infinity) {
           return null;
         }
-        return erdosTable.indexOf(max);
+        return randomPick(range(0, n).filter(x => erdosScores[x] === max));
       case "pairing":
         if (pairing === null) {
           return null;
@@ -134,6 +159,9 @@
   }
 
   async function play(i: number) {
+    if (position[i] !== 0 || showStrat) {
+      return;
+    }
     position = position.with(i, 1);
     //turn = turn === 1 ? 2 : 1;
     showStrat = true;
@@ -145,8 +173,8 @@
     }
   }
 
-  function pairPath(x: number, y: number, w: number, h: number, r: number){
-    r = Math.max(0, Math.min(r, Math.min(w,h)/2));
+  function pairPath(x: number, y: number, w: number, h: number) {
+    const r = h / 2;
     return [
       'M', x + r, y,
       'H', x + w - r,
@@ -174,7 +202,7 @@
   {@const angle = Math.atan2(dy, dx) * 180 / Math.PI}
   {@const midX = (x1 + x2) / 2}
   {@const midY = (y1 + y2) / 2}
-  {@const d = pairPath(-w/2, -h/2, w, h, 50)}
+  {@const d = pairPath(-w/2, -h/2, w, h)}
   <path
     {d}
     class={["pair", {visible}]}
@@ -191,6 +219,95 @@
   />
 {/snippet}
 
+{#snippet board()}
+  <svg class="board" viewBox="0 0 600 600">
+    <defs>
+      <filter id="glow" height="200%" width="200%" x="-50%" y="-50%">
+        <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+        <feMerge>
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <radialGradient id="gradA" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="#1e293b" stop-opacity="1"/>
+      </radialGradient>
+      <radialGradient id="gradB" cx="50%" cy="50%" r="50%">
+        <stop offset="0%" stop-color="#22c55e" stop-opacity="0.9"/>
+        <stop offset="100%" stop-color="#1e293b" stop-opacity="1"/>
+      </radialGradient>
+    </defs>
+    {#each edges as [u, v]}
+      <line
+        x1={nodes[u].x}
+        y1={nodes[u].y}
+        x2={nodes[v].x}
+        y2={nodes[v].y}
+        class={["edge", {
+          player1: graph !== "hypergraph" && position[u] === 1 && position[v] === 1,
+          player2: graph !== "hypergraph" &&  variant === "makermaker" && position[u] === 2 && position[v] === 2,
+        }]}
+      />
+    {/each}
+    {#if pairing !== null}
+      {#each pairing as [u, v]}
+        {@render pair(u, v, showStrat)}
+      {/each}
+    {/if}
+    {#if graph === "hypergraph"}
+      {#each wsets as [a, b, c]}
+        {#if position[a] === 1 && position[b] === 1 && position[c] === 1}
+          {@const {x: x1, y: y1} = nodes[a]}
+          {@const {x: x2, y: y2} = nodes[b]}
+          {@const {x: x3, y: y3} = nodes[c]}
+          <polygon
+            points="{x1},{y1} {x2},{y2} {x3},{y3}"
+            fill="rgba(124,58,237, 0.3)"
+            stroke="rgba(124,58,237, 0.6)"
+            stroke-width="3"
+            filter="url(#glow)"
+          />
+        {:else if variant === "makermaker" && position[a] === 2 && position[b] === 2 && position[c] === 2}
+          {@const {x: x1, y: y1} = nodes[a]}
+          {@const {x: x2, y: y2} = nodes[b]}
+          {@const {x: x3, y: y3} = nodes[c]}
+          <polygon
+            points="{x1},{y1} {x2},{y2} {x3},{y3}"
+            fill="rgba(34,197,94, 0.3)"
+            stroke="rgba(34,197,94, 0.6)"
+            stroke-width="3"
+            filter="url(#glow)"
+          />
+        {/if}
+      {/each}
+    {/if}
+    {#if erdosScores !== null}
+      {#each erdosScores as score, i}
+        {@const {x, y} = nodes[i] }
+        {@render erdosSquare(x, y, score, showStrat)}
+      {/each}
+    {/if}
+    {#each nodes as {x, y}, i}
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <circle
+        cx={x}
+        cy={y}
+        r="16"
+        stroke="#9ca3af"
+        class="nonplayed"
+        onclick={() => play(i)}
+      />
+      {#if position[i] === 1}
+        <circle cx={x} cy={y} r="18" fill="url(#gradA)" stroke="#7c3aed" stroke-width="3" />
+      {:else if position[i] === 2}
+        <circle cx={x} cy={y} r="18" fill="url(#gradB)" stroke="#22c55e" stroke-width="3" />
+      {/if}
+    {/each}
+  </svg>
+{/snippet}
+
 <Wrap>
   <main class="center-card">
     <Logo/>
@@ -201,67 +318,9 @@
     <div class="board-wrap">
       <div class="scores">
         <span class="score1">Score d'Alice: {score1}</span>
-        <span class="score2">Score de Bob: {score2}</span>
+        <span class="score2">Score de Bob: {variant === "makerbreaker" ? "ø" : score2}</span>
       </div>
-      <svg class="board" viewBox="0 0 600 600">
-        <defs>
-          <filter id="glow" height="200%" width="200%" x="-50%" y="-50%">
-            <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
-            <feMerge>
-              <feMergeNode in="coloredBlur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-          <radialGradient id="gradA" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.9"/>
-            <stop offset="100%" stop-color="#1e293b" stop-opacity="1"/>
-          </radialGradient>
-          <radialGradient id="gradB" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stop-color="#22c55e" stop-opacity="0.9"/>
-            <stop offset="100%" stop-color="#1e293b" stop-opacity="1"/>
-          </radialGradient>
-        </defs>
-        {#each edges as [u, v]}
-          <line
-            x1={nodes[u].x}
-            y1={nodes[u].y}
-            x2={nodes[v].x}
-            y2={nodes[v].y}
-            class={["edge", {
-              player1: position[u] === 1 && position[v] === 1,
-              player2: position[u] === 2 && position[v] === 2,
-            }]}
-          />
-        {/each}
-        {#if pairing !== null}
-          {#each pairing as [u, v]}
-            {@render pair(u, v, showStrat)}
-          {/each}
-        {/if}
-        {#if erdosTable !== null}
-          {#each erdosTable as score, i}
-            {@const {x, y} = nodes[i] }
-            {@render erdosSquare(x, y, score, showStrat)}
-          {/each}
-        {/if}
-        {#each nodes as {x, y}, i}
-          <!-- svelte-ignore a11y_click_events_have_key_events -->
-          <!-- svelte-ignore a11y_no_static_element_interactions -->
-          <circle
-            cx={x}
-            cy={y}
-            r="16"
-            stroke="#9ca3af"
-            class="nonplayed"
-            onclick={() => play(i)}
-          />
-          {#if position[i] === 1}
-            <circle cx={x} cy={y} r="18" fill="url(#gradA)" stroke="#7c3aed" stroke-width="3" />
-          {:else if position[i] === 2}
-            <circle cx={x} cy={y} r="18" fill="url(#gradB)" stroke="#22c55e" stroke-width="3" />
-          {/if}
-        {/each}
-      </svg>
+      {@render board()}
     </div>
   </main>
 
@@ -288,11 +347,11 @@
   }
 
   .score1 {
-    color: rgba(124,58,237,0.9);
+    color: rgba(124,58,237, 0.9);
   }
 
   .score2 {
-    color: #22c55e;
+    color: rgb(34, 197, 94, 0.9);
   }
 
   .board {
@@ -309,11 +368,11 @@
     stroke-width: 3;
   }
   .edge.player1 {
-    stroke:rgba(124,58,237,0.9);
+    stroke:rgba(124, 58, 237, 0.9);
     stroke-width: 5;
   }
   .edge.player2 {
-    stroke: #22c55e;
+    stroke: rgb(34, 197, 94, 0.9);
     stroke-width: 5;
   }
 
