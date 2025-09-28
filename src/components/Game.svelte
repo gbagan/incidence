@@ -284,8 +284,10 @@
     {/if}
     {#if erdosScores !== null}
       {#each erdosScores as score, i}
-        {@const {x, y} = nodes[i] }
-        {@render erdosSquare(x, y, score, showStrat)}
+        {#if score !== -Infinity}
+          {@const {x, y} = nodes[i]}
+          {@render erdosSquare(x, y, score, showStrat)}
+        {/if}
       {/each}
     {/if}
     {#each nodes as {x, y}, i}
