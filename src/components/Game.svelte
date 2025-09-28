@@ -1,6 +1,8 @@
 <script lang="ts">
+    import { roundedPolygon } from "../geometry";
   import type { Edge, Graph, Strategy, Variant } from "../types";
   import { countBy, delay, generate, generate2, randomPick, range, repeat } from "../util";
+    import Breadcrumb from "./Breadcrumb.svelte";
   import Logo from "./Logo.svelte";
   import Wrap from "./Wrap.svelte";
 
@@ -18,6 +20,7 @@
 
   let nodeCount = $derived.by(() => {
     switch (graph) {
+      case "path": return 24;
       case "cycle": return 20;
       case "grid": return 64;
       case "triangle": return 80;
@@ -27,6 +30,11 @@
 
   let nodes: {x: number, y: number}[] = $derived.by(() => {
     switch (graph) {
+      case "path":
+        return generate(nodeCount, i => ({
+          x: i < 8 ? 50 + i * 60 : i < 16 ? 530 : 50 + (23 - i) * 60,
+          y: i < 8 ? 80 : i < 16 ? 80 + (i - 8) * 60 : 500
+        }));
       case "cycle":
         return generate(nodeCount, i => {
           const angle = 2 * Math.PI * i / nodeCount - Math.PI/2; // start top
@@ -45,6 +53,7 @@
 
   const edges: [number, number][] = $derived.by(() => {
     switch (graph) {
+      case "path": return generate(nodeCount - 1, i => [i, i + 1]);
       case "cycle": return generate(nodeCount, i => [i, (i+1) % nodeCount]);
       case "grid": return [
         ...generate2(8, 7, (i, j) => [8 * i + j, 8 * i + j + 1] as Edge),
@@ -95,7 +104,7 @@
   let score2 = $derived(countBy(wsets, (set => set.every(x => position[x] === 2))));
  
   let pairing = $derived(
-    graph === "cycle" && strategy === "pairing" 
+    (graph === "cycle" || graph === "path") && strategy === "pairing" 
     ? generate(nodeCount >> 1, i => [2*i, 2*i+1])
     : null
   );
@@ -263,10 +272,7 @@
           {@const {x: x3, y: y3} = nodes[c]}
           <polygon
             points="{x1},{y1} {x2},{y2} {x3},{y3}"
-            fill="rgba(124,58,237, 0.3)"
-            stroke="rgba(124,58,237, 0.6)"
-            stroke-width="3"
-            filter="url(#glow)"
+            class="triangle1"
           />
         {:else if variant === "makermaker" && position[a] === 2 && position[b] === 2 && position[c] === 2}
           {@const {x: x1, y: y1} = nodes[a]}
@@ -274,10 +280,7 @@
           {@const {x: x3, y: y3} = nodes[c]}
           <polygon
             points="{x1},{y1} {x2},{y2} {x3},{y3}"
-            fill="rgba(34,197,94, 0.3)"
-            stroke="rgba(34,197,94, 0.6)"
-            stroke-width="3"
-            filter="url(#glow)"
+            class="triangle2"
           />
         {/if}
       {/each}
@@ -289,6 +292,12 @@
           {@render erdosSquare(x, y, score, showStrat)}
         {/if}
       {/each}
+    {/if}
+    {#if false && graph === "hypergraph"}
+      <path
+        d={roundedPolygon(nodes[11].x, nodes[11].y, 90, 6, 4)}
+        class="hexagon"
+      />
     {/if}
     {#each nodes as {x, y}, i}
       <!-- svelte-ignore a11y_click_events_have_key_events -->
@@ -311,6 +320,7 @@
 {/snippet}
 
 <Wrap>
+  <Breadcrumb {variant} {graph} {strategy} />
   <main class="center-card">
     <Logo/>
     <div class="backbutton">
@@ -371,10 +381,11 @@
     padding: 1rem;
   }
 
-  .edge{
+  .edge {
     stroke: #9ca3af;
     stroke-width: 3;
   }
+
   .edge.player1 {
     stroke:rgba(124, 58, 237, 0.9);
     stroke-width: 5;
@@ -412,5 +423,27 @@
     &.visible {
       opacity: 0.5;
     }
+  }
+
+  .triangle1 {
+    fill: rgba(124,58,237, 0.3);
+    stroke: rgba(124,58,237, 0.6);
+    stroke-width: 3;
+    filter: url(#glow);
+  }
+
+  .triangle2 {
+    fill: rgba(34,197,94, 0.3);
+    stroke: rgba(34,197,94, 0.6);
+    stroke-width: 3;
+    filter: url(#glow);
+  }
+
+  .hexagon {
+    fill: none;
+    stroke: red;
+    stroke-width: 3;
+    fill: rgba(255,163,175, 0.2);
+    filter: url(#glow);
   }
 </style>

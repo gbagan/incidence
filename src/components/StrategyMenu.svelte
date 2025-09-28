@@ -1,5 +1,7 @@
 <script lang="ts">
+    import katexify from "../katexify";
   import type { Strategy, Variant } from "../types";
+    import Breadcrumb from "./Breadcrumb.svelte";
   import Logo from "./Logo.svelte";
   import Wrap from "./Wrap.svelte";
 
@@ -9,10 +11,12 @@
     back: () => void;
   }
 
-  let { select, variant, back }: Props = $props();
+  let { variant, select, back }: Props = $props();
+  let hover: Strategy | null = $state(null);
 </script>
 
 <Wrap>
+  <Breadcrumb {variant} />
   <main class="center-card">
     <div class="logo-container">
       <Logo />
@@ -24,27 +28,52 @@
       </p>
 
       <div class="buttons">
-        <button class="btn btn1" onclick={() => select("random")}>Aléatoire</button>
-        <button class="btn btn2" onclick={() => select("erdos")}>Erdős-Selfridge</button>
-        <button class="btn btn3" onclick={() => select("pairing")}>Pairing</button>
+        <button
+          class="btn btn1"
+          onclick={() => select("random")}
+          onpointerenter={() => hover = "random"}
+          onpointerleave={() => hover = null}
+        >
+          Aléatoire
+        </button>
+        <button
+          class="btn btn2"
+          onclick={() => select("erdos")}
+          onpointerenter={() => hover = "erdos"}
+          onpointerleave={() => hover = null}
+        >
+          Erdős-Selfridge
+        </button>
+        <button
+          class="btn btn3"
+          onclick={() => select("pairing")}
+          onpointerenter={() => hover = "pairing"}
+          onpointerleave={() => hover = null}
+        >
+          Pairing
+        </button>
       </div>
     </section>
   </main>
   <aside class="info">
     <h3>À propos du jeu</h3>
-    {#if variant === "makermaker"}
+    {#if hover === "random"}
       <p>
-        Dans la version <strong>Maker-Maker</strong> sur les graphes, une stratégie optimale simple existe pour chacun des joueurs.
-        Elle consiste à choisir un sommet de degré maximal parmi les sommets non déjà choisis.
+        La stratégie aléatoire choisit un sommet au hasard parmi les sommets non déjà choisis.
+        C'est une stratégie faible mais qui permet de varier les parties.
       </p>
+    {:else if hover === "erdos"}
       <p>
-        En particulier, la version Maker-Maker sur un graphe régulier finit par un match nul.
+        Cette stratégie est basée sur le théorème d'<strong>Erdős-Selfridge</strong>. todo.
+        
       </p>
-      <p>Le résultat n'est plus vrai sur les hypergraphes, le problème étant PSPACE-complet.</p>
-    {:else}
-      <p>Contrairement à la version Maker-Maker, la version <strong>Maker-Breaker</strong> est difficile. Le problème est PSPACE-complet.</p>
-      <p>Cependant, il existe des heuristiques, des bornes supérieures et inférieures ainsi que des statégies optimales pour
-        des classes de graphes comme les chemins ou cycles.</p>
+    {:else if hover === "pairing"}
+      <p>
+        La stratégie de <strong>pairing</strong> est une stratégie qui consiste à regrouper les sommets par paires
+        et à choisir le sommet apparié à celui choisi par l'adversaire.
+        Cette stratégie appliquée à Breaker permet de garantir un score au plus
+        {@html katexify("\\left\\lceil{\\frac{n}{4}} \\right\\rceil")} sur les cycles.
+      </p>
     {/if}
   </aside>
 </Wrap>

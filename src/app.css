@@ -111,7 +111,7 @@ html,body{
     border-radius: 1rem;
     padding: 1.5rem;
     box-shadow: 0 8px 30px rgba(3,8,20,0.6);
-    min-height: 9rem;
+    min-height: 30rem;
   }
   .info h3{
     margin: 0 0 0.7rem 0;

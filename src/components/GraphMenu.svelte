@@ -1,5 +1,7 @@
 <script lang="ts">
+    import katexify from "../katexify";
   import type { Graph, Strategy, Variant } from "../types";
+    import Breadcrumb from "./Breadcrumb.svelte";
   import Logo from "./Logo.svelte";
   import Wrap from "./Wrap.svelte";
 
@@ -11,9 +13,11 @@
   }
 
   let { variant, strategy, select, back }: Props = $props();
+  let hover: Graph | null = $state(null);
 </script>
 
 <Wrap>
+  <Breadcrumb {variant} {strategy} />
   <main class="center-card">
     <div class="logo-container">
       <Logo />
@@ -25,28 +29,97 @@
       </p>
 
       <div class="buttons">
-        <button class="btn btn1" onclick={() => select("cycle")}>Cycle</button>
-        <button class="btn btn2" disabled={strategy === "pairing"} onclick={() => select("grid")}>Grille</button>
-        <button class="btn btn3" disabled={strategy === "pairing"} onclick={() => select("triangle")}>Grille triangulaire</button>
-        <button class="btn btn1" disabled={strategy === "pairing"} onclick={() => select("hypergraph")}>Hypergraphe</button>
+        <button
+          class="btn btn1"
+          onclick={() => select("path")}
+          onpointerenter={() => hover = "path"}
+          onpointerleave={() => hover = null}
+        >
+          Chemin
+        </button>
+        <button
+          class="btn btn2"
+          onclick={() => select("cycle")}
+          onpointerenter={() => hover = "cycle"}
+          onpointerleave={() => hover = null}
+        >
+          Cycle
+        </button>
+        <button
+          class="btn btn3"
+          disabled={strategy === "pairing"}
+          onclick={() => select("grid")}
+          onpointerenter={() => hover = "grid"}
+          onpointerleave={() => hover = null}
+        >
+          Grille
+        </button>
+        <button
+          class="btn btn2"
+          disabled={strategy === "pairing"}
+          onclick={() => select("triangle")}
+          onpointerenter={() => hover = "triangle"}
+          onpointerleave={() => hover = null}
+        >
+          Grille triangulaire
+        </button>
+        <button
+          class="btn btn3"
+          disabled={strategy === "pairing"}
+          onclick={() => select("hypergraph")}
+          onpointerenter={() => hover = "hypergraph"}
+          onpointerleave={() => hover = null}
+        >
+          Hypergraphe
+        </button>
       </div>
     </section>
   </main>
   <aside class="info">
     <h3>À propos du jeu</h3>
-    {#if variant === "makermaker"}
+    {#if hover === "path"}
       <p>
-        Dans la version <strong>Maker-Maker</strong> sur les graphes, une stratégie optimale simple existe pour chacun des joueurs.
-        Elle consiste à choisir un sommet de degré maximal parmi les sommets non déjà choisis.
+        Un chemin est une suite de sommets où chaque sommet (sauf les extrémités) 
+        est connecté à deux autres sommets.
       </p>
       <p>
-        En particulier, la version Maker-Maker sur un graphe régulier d'ordre pair finit toujours par un match nul.
+        Une stratégie optimale en temps polynomial existe pour cette classe de graphes.
+        Le score si les deux joueurs jouent parfaitement est asymptotiquement égal à
+        {@html katexify("\\frac{n}{5}")}.
       </p>
-      <p>Le résultat n'est plus vrai sur les hypergraphes, le problème étant PSPACE-complet pour les hypergraphes 3-uniformes.</p>
+    {:else if hover === "cycle"}
+      <p>
+        Un cycle est un graphe où chaque sommet est connecté à deux autres sommets, formant une boucle fermée.
+      </p>
+      <p>
+        Une stratégie optimale en temps polynomial existe pour cette classe de graphes.
+        Le score si les deux joueurs jouent parfaitement est asymptotiquement égal à
+        {@html katexify("\\frac{n}{5}")}.
+      </p>
+    {:else if hover === "grid"}
+      <p>
+        Une grille est un graphe en deux dimensions où chaque sommet est connecté à
+        ses voisins horizontaux et verticaux.
+      </p>
+    {:else if hover === "triangle"}
+      <p>
+        Une grille triangulaire est une variante de la grille où chaque sommet est connecté
+        à ses voisins dans une disposition triangulaire.
+      </p>
+    {:else if hover === "hypergraph"}
+      <p>
+        Se joue également sur un graphe triangulaire mais il faut récupérer les triangles
+        (hyperarêtes) au lieu des arêtes.
+      </p>
+      <p>Le score si les deux joueurs jouent parfaitement est compris entre
+        {@html katexify("\\left \\lfloor \\frac{n}{28} \\right \\rfloor")} et
+        {@html katexify("\\left \\lceil \\frac{n}{8} \\right \\rceil")}.
+      </p>
     {:else}
-      <p>Contrairement à la version Maker-Maker, la version <strong>Maker-Breaker</strong> est difficile. Le problème est PSPACE-complet.</p>
-      <p>Cependant, il existe des heuristiques, des bornes supérieures et inférieures ainsi que des statégies optimales pour
-        des classes de graphes comme les chemins ou cycles.</p>
+      <p>
+        Le jeu Incidence a été étudié sur plusieurs classes de graphes.
+        Pour certaines classes, comme les chemins ou les cycles, le jeu possède une stratégie optimale en temps polynomial.
+      </p>
     {/if}
   </aside>
 </Wrap>
