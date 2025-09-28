@@ -332,6 +332,12 @@
 </Wrap>
 
 <style>
+  .backbutton {
+    position: absolute;
+    left: 2rem;
+    bottom: 2rem;
+  }
+
   .board-wrap {
     display: flex;
     justify-content: center;
@@ -358,7 +364,7 @@
     width: 35rem;
     height: 35rem;
     max-width: 100%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(255,255,255,0.005));
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
     border-radius: 0.8rem;
     padding: 1rem;
   }

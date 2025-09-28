@@ -1,4 +1,4 @@
-<script lang="ts">
+  <script lang="ts">
   import { fade } from "svelte/transition";
 
   type Props = {children: () => any};
@@ -14,16 +14,18 @@
 </div>
 
 <style>
-  .wrap{
-    min-height:100vh;
-    display:grid;
-    grid-template-columns:1fr 420px;
-    align-items:center;
+  .wrap {
+    position: absolute;
+    inset: 0;
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: 1fr 25rem;
+    align-items: center;
     gap: 2.5rem;
     padding: 3rem;
   }
   
-  @media (max-width:920px) {
+  @media (orientation: portrait) {
     .wrap{
       grid-template-columns:1fr;
       padding: 2rem;

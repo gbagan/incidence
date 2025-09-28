@@ -21,7 +21,7 @@
     </div>
     <section class="menu">
       <p class="desc">
-        Choisis le type de graphes. Le dernier type est un hypergraphe.
+        Choisis le type de graphe que tu souhaites utiliser comme plateau de jeu.
       </p>
 
       <div class="buttons">
