@@ -36,22 +36,33 @@
         >
           Aléatoire
         </button>
-        <button
-          class="btn btn2"
-          onclick={() => select("erdos")}
-          onpointerenter={() => hover = "erdos"}
-          onpointerleave={() => hover = null}
-        >
-          Erdős-Selfridge
-        </button>
-        <button
-          class="btn btn3"
-          onclick={() => select("pairing")}
-          onpointerenter={() => hover = "pairing"}
-          onpointerleave={() => hover = null}
-        >
-          Pairing
-        </button>
+        {#if variant === "makermaker"}
+          <button
+            class="btn btn2"
+            onclick={() => select("degree")}
+            onpointerenter={() => hover = "degree"}
+            onpointerleave={() => hover = null}
+          >
+            Optimale
+          </button>  
+        {:else}
+          <button
+            class="btn btn2"
+            onclick={() => select("erdos")}
+            onpointerenter={() => hover = "erdos"}
+            onpointerleave={() => hover = null}
+          >
+            Erdős-Selfridge
+          </button>
+          <button
+            class="btn btn3"
+            onclick={() => select("pairing")}
+            onpointerenter={() => hover = "pairing"}
+            onpointerleave={() => hover = null}
+          >
+            Pairing
+          </button>
+        {/if}
       </div>
     </section>
   </main>
@@ -61,6 +72,12 @@
       <p>
         La stratégie aléatoire choisit un sommet au hasard parmi les sommets non déjà choisis.
         C'est une stratégie faible mais qui permet de varier les parties.
+      </p>
+    {:else if hover === "degree"}
+      <p>
+        Cette stratégie est optimale pour la version Maker-Maker sur les graphes.
+        Elle consiste à choisir un sommet de <strong>degré maximal</strong>
+        parmi les sommets non déjà choisis.
       </p>
     {:else if hover === "erdos"}
       <p>

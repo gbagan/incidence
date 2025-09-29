@@ -138,11 +138,43 @@
     return table.map(x => x === -Infinity ? -Infinity : min === max ? 0 : (x - min) / (max - min));
   });
 
+  let degrees: number[] = $derived.by(() => {
+    const deg = repeat(nodeCount, 0);
+    for (const [u, v] of edges) {
+      deg[u]++;
+      deg[v]++;
+    }
+    return deg;
+  });
+
+  let nodesSortedByDegree: number[] = $derived.by(() => {
+    const deg = degrees;
+    return range(0, nodeCount).sort((a, b) => deg[b] - deg[a]);
+  });
+
+  let maxDegrees = $derived.by(() => {
+    if (strategy !== "degree" || nodesSortedByDegree.length === 0) {
+      return null;
+    }
+    const max = nodesSortedByDegree.find(i => position[i] === 0);
+    if (max === undefined) {
+      return null;
+    }
+    const d = degrees[max];
+    return range(0, nodeCount).filter(i => position[i] === 0 && degrees[i] === d)
+  });
+
+
   function computerMove(prevMove: number): number | null {
     const n = position.length;
     switch (strategy) {
       case "random":
         return randomPick(range(0, n).filter(i => position[i] === 0));
+      case "degree":
+        if (maxDegrees === null) {
+          return null;
+        }
+        return randomPick(maxDegrees);
       case "erdos":
         if (erdosScores === null) {
           return null;
@@ -291,6 +323,12 @@
           {@const {x, y} = nodes[i]}
           {@render erdosSquare(x, y, score, showStrat)}
         {/if}
+      {/each}
+    {/if}
+    {#if maxDegrees !== null}
+      {#each maxDegrees as i}
+        {@const {x, y} = nodes[i]}
+        {@render erdosSquare(x, y, 1, showStrat)}
       {/each}
     {/if}
     {#if false && graph === "hypergraph"}
