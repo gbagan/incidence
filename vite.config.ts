@@ -11,10 +11,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       injectRegister: 'auto',
       manifest: {
-        name: 'Valise Maths à modeler',
-        short_name: 'Valise MAM',
-        start_url: '/~mam/valise/',
-        scope: '/~mam/valise/',
+        name: 'Incidence',
+        short_name: 'Incidence',
+        start_url: '/indidence/',
+        scope: '/incidence/',
         display: 'standalone',
         background_color: '#ffffff',
         theme_color: '#0000ff'

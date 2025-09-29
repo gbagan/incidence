@@ -1,5 +1,5 @@
 <script lang="ts">
-  import katexify from "../katexify";
+  import { formulaCeilN8, formulaFloorN28, formulaN5 } from "../formulas";
   import type { Graph, Strategy, Variant } from "../types";
   import Breadcrumb from "./Breadcrumb.svelte";
   import Logo from "./Logo.svelte";
@@ -85,7 +85,7 @@
       <p>
         Une stratégie optimale en temps polynomial existe pour cette classe de graphes.
         Le score si les deux joueurs jouent parfaitement est asymptotiquement égal à
-        {@html katexify("\\frac{n}{5}")}
+        {@html formulaN5}.
       </p>
     {:else if hover === "cycle"}
       <p>
@@ -94,7 +94,7 @@
       <p>
         Une stratégie optimale en temps polynomial existe pour cette classe de graphes.
         Le score si les deux joueurs jouent parfaitement est asymptotiquement égal à
-        {@html katexify("\\frac{n}{5}")}.
+        {@html formulaN5}.
       </p>
     {:else if hover === "grid"}
       <p>
@@ -112,8 +112,8 @@
         (hyperarêtes) au lieu des arêtes.
       </p>
       <p>Le score si les deux joueurs jouent parfaitement est compris entre
-        {@html katexify("\\left \\lfloor \\frac{n}{28} \\right \\rfloor")} et
-        {@html katexify("\\left \\lceil \\frac{n}{8} \\right \\rceil")}.
+        {@html formulaFloorN28} et
+        {@html formulaCeilN8}.
       </p>
     {:else}
       <p>
