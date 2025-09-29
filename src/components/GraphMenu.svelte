@@ -2,6 +2,8 @@
   import type { Graph, Strategy, Variant } from "../types";
   import Breadcrumb from "./Breadcrumb.svelte";
   import Logo from "./Logo.svelte";
+  import Button from "./Button.svelte";
+  import Menu from "./Menu.svelte";
   import Wrap from "./Wrap.svelte";
 
   type Props = {
@@ -20,59 +22,20 @@
   <main class="center-card">
     <div class="logo-container">
       <Logo />
-      <button class="btn btn3" onclick={back}>Retour</button>
+      <Button onclick={back}>Retour</Button>
     </div>
-    <section class="menu">
-      <p class="desc">
-        Choisis le type de graphe que tu souhaites utiliser comme plateau de jeu.
-      </p>
-
-      <div class="buttons">
-        <button
-          class="btn btn1"
-          onclick={() => select("path")}
-          onpointerenter={() => hover = "path"}
-          onpointerleave={() => hover = null}
-        >
-          Chemin
-        </button>
-        <button
-          class="btn btn2"
-          onclick={() => select("cycle")}
-          onpointerenter={() => hover = "cycle"}
-          onpointerleave={() => hover = null}
-        >
-          Cycle
-        </button>
-        <button
-          class="btn btn3"
-          disabled={strategy === "pairing"}
-          onclick={() => select("grid")}
-          onpointerenter={() => hover = "grid"}
-          onpointerleave={() => hover = null}
-        >
-          Grille
-        </button>
-        <button
-          class="btn btn2"
-          disabled={strategy === "pairing"}
-          onclick={() => select("triangle")}
-          onpointerenter={() => hover = "triangle"}
-          onpointerleave={() => hover = null}
-        >
-          Grille triangulaire
-        </button>
-        <button
-          class="btn btn3"
-          disabled={strategy === "pairing" || strategy === "degree"}
-          onclick={() => select("hypergraph")}
-          onpointerenter={() => hover = "hypergraph"}
-          onpointerleave={() => hover = null}
-        >
-          Hypergraphe
-        </button>
-      </div>
-    </section>
+    <Menu
+      title="Choisis le type de graphe que tu souhaites utiliser comme plateau de jeu."
+      {select}
+      hover={g => hover = g}
+      buttons={[
+        { id: "path", text: "Chemin" },
+        { id: "cycle", text: "Cycle" },
+        { id: "grid", text: "Grille", disabled: strategy === "pairing" },
+        { id: "triangle", text: "Grille triangulaire", disabled: strategy === "pairing" },
+        { id: "hypergraph", text: "Hypergraphe", disabled: strategy === "pairing" || strategy === "degree" }
+      ]}
+    />
   </main>
   <aside class="info">
     <h3>À propos du jeu</h3>

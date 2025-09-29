@@ -3,6 +3,7 @@
   import type { Edge, Graph, Strategy, Variant } from "../types";
   import { countBy, delay, generate, generate2, randomPick, range, repeat } from "../util";
   import Breadcrumb from "./Breadcrumb.svelte";
+  import Button from "./Button.svelte";
   import Logo from "./Logo.svelte";
   import Wrap from "./Wrap.svelte";
 
@@ -362,7 +363,7 @@
   <main class="center-card">
     <Logo/>
     <div class="backbutton">
-      <button class="btn btn3" onclick={back}>Retour</button>
+      <Button onclick={back}>Retour</Button>
     </div>
 
     <div class="board-wrap">

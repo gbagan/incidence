@@ -1,7 +1,9 @@
 <script lang="ts">
   import type { Strategy, Variant } from "../types";
   import Breadcrumb from "./Breadcrumb.svelte";
+  import Button from "./Button.svelte";
   import Logo from "./Logo.svelte";
+  import Menu from "./Menu.svelte";
   import Wrap from "./Wrap.svelte";
 
   type Props = {
@@ -19,51 +21,23 @@
   <main class="center-card">
     <div class="logo-container">
       <Logo />
-      <button class="btn btn3" onclick={back}>Retour</button>
+      <Button onclick={back}>Retour</Button>
     </div>
-    <section class="menu">
-      <p class="desc">
-        Choisis la stratégie de l'adversaire.
-      </p>
-
-      <div class="buttons">
-        <button
-          class="btn btn1"
-          onclick={() => select("random")}
-          onpointerenter={() => hover = "random"}
-          onpointerleave={() => hover = null}
-        >
-          Aléatoire
-        </button>
-        {#if variant === "makermaker"}
-          <button
-            class="btn btn2"
-            onclick={() => select("degree")}
-            onpointerenter={() => hover = "degree"}
-            onpointerleave={() => hover = null}
-          >
-            Optimale
-          </button>  
-        {:else}
-          <button
-            class="btn btn2"
-            onclick={() => select("erdos")}
-            onpointerenter={() => hover = "erdos"}
-            onpointerleave={() => hover = null}
-          >
-            Erdős-Selfridge
-          </button>
-          <button
-            class="btn btn3"
-            onclick={() => select("pairing")}
-            onpointerenter={() => hover = "pairing"}
-            onpointerleave={() => hover = null}
-          >
-            Pairing
-          </button>
-        {/if}
-      </div>
-    </section>
+    <Menu
+      title="Choisis la stratégie de l'adversaire."
+      {select}
+      hover={s => hover = s}
+      buttons={
+        variant === "makermaker" ? [
+          { id: "random", text: "Aléatoire" },
+          { id: "degree", text: "Optimale" }
+        ] : [
+          { id: "random", text: "Aléatoire" },
+          { id: "erdos", text: "Erdős-Selfridge" },
+          { id: "pairing", text: "Pairing" }
+        ]
+      }
+    /> 
   </main>
   <aside class="info">
     <h3>À propos du jeu</h3>

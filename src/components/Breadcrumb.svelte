@@ -14,6 +14,7 @@
     strategy === "random" ? "Aléatoire"
     : strategy === "erdos" ? "Erdős-Selfridge"
     : strategy === "pairing" ? "Pairing"
+    : strategy === "degree" ? "Optimale"
     : null
   );
   let graphText = $derived(

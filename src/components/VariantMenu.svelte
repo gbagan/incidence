@@ -1,7 +1,8 @@
 <script lang="ts">
   import type { Variant } from "../types";
-    import Breadcrumb from "./Breadcrumb.svelte";
+  import Breadcrumb from "./Breadcrumb.svelte";
   import Logo from "./Logo.svelte";
+  import Menu from "./Menu.svelte";
   import Wrap from "./Wrap.svelte";
 
   type Props = {
@@ -17,32 +18,17 @@
   <main class="center-card">
     <Logo />
 
-    <section class="menu" aria-label="Menu des modes de jeu">
-      <p class="desc">
-        Choisis la version du jeu: Maker-Maker ou Maker-Breaker.
-      </p>
-
-      <div class="buttons">
-        <button
-          class="btn btn1"
-          onclick={() => select("makermaker")}
-          onpointerenter={() => hover = "makermaker"}
-          onpointerleave={() => hover = null}
-        >
-          Maker-Maker
-        </button>
-        <button
-          class="btn btn2"
-          onclick={() => select("makerbreaker")}
-          onpointerenter={() => hover = "makerbreaker"}
-          onpointerleave={() => hover = null}
-        >
-          Maker-Breaker
-        </button>
-      </div>
-    </section>
+    <Menu
+      title="Choisis la version du jeu."
+      {select}
+      hover={v => hover = v}
+      buttons={[
+        { id: "makermaker", text: "Maker-Maker" },
+        { id: "makerbreaker", text: "Maker-Breaker" }
+      ]}
+    />
   </main>
-  <aside class="info" aria-label="Explication du jeu">
+  <aside class="info">
     <h3>À propos du jeu</h3>
     {#if hover === "makermaker"}
       <p>
