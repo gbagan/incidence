@@ -1,4 +1,6 @@
 <script lang="ts">
+  import type { Graph, Strategy, Variant } from "../types";
+
   type Props = {
     variant?: Variant | null;
     graph?: Graph | null;
@@ -37,9 +39,9 @@
 <style>
   .breadcrumb {
     position:absolute;
-    top: 12px;
-    left:12px;
-    padding: 6px 12px;
+    top: 0.8rem;
+    left:0.8rem;
+    padding: 0.4rem 0.8rem;
     background:rgba(15,23,36,0.92);
     border: 1px solid #374151;
     border-radius: 0.4rem;

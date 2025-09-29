@@ -1,7 +1,7 @@
 <script lang="ts">
-    import katexify from "../katexify";
+  import katexify from "../katexify";
   import type { Graph, Strategy, Variant } from "../types";
-    import Breadcrumb from "./Breadcrumb.svelte";
+  import Breadcrumb from "./Breadcrumb.svelte";
   import Logo from "./Logo.svelte";
   import Wrap from "./Wrap.svelte";
 
@@ -65,7 +65,7 @@
         </button>
         <button
           class="btn btn3"
-          disabled={strategy === "pairing"}
+          disabled={strategy === "pairing" || strategy === "degree"}
           onclick={() => select("hypergraph")}
           onpointerenter={() => hover = "hypergraph"}
           onpointerleave={() => hover = null}
@@ -85,7 +85,7 @@
       <p>
         Une stratégie optimale en temps polynomial existe pour cette classe de graphes.
         Le score si les deux joueurs jouent parfaitement est asymptotiquement égal à
-        {@html katexify("\\frac{n}{5}")}.
+        {@html katexify("\\frac{n}{5}")}
       </p>
     {:else if hover === "cycle"}
       <p>

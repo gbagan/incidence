@@ -1,7 +1,7 @@
 <script lang="ts">
-    import katexify from "../katexify";
+  import { formulaN4 } from "../formulas";
   import type { Strategy, Variant } from "../types";
-    import Breadcrumb from "./Breadcrumb.svelte";
+  import Breadcrumb from "./Breadcrumb.svelte";
   import Logo from "./Logo.svelte";
   import Wrap from "./Wrap.svelte";
 
@@ -89,7 +89,7 @@
         La stratégie de <strong>pairing</strong> est une stratégie qui consiste à regrouper les sommets par paires
         et à choisir le sommet apparié à celui choisi par l'adversaire.
         Cette stratégie appliquée à Breaker permet de garantir un score au plus
-        {@html katexify("\\left\\lceil{\\frac{n}{4}} \\right\\rceil")} sur les cycles.
+        {@html formulaN4} sur les cycles.
       </p>
     {/if}
   </aside>

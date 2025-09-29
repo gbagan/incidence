@@ -1,8 +1,8 @@
 <script lang="ts">
-    import { roundedPolygon } from "../geometry";
+  import { roundedPolygon } from "../geometry";
   import type { Edge, Graph, Strategy, Variant } from "../types";
   import { countBy, delay, generate, generate2, randomPick, range, repeat } from "../util";
-    import Breadcrumb from "./Breadcrumb.svelte";
+  import Breadcrumb from "./Breadcrumb.svelte";
   import Logo from "./Logo.svelte";
   import Wrap from "./Wrap.svelte";
 
