@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { formulaN4 } from "../formulas";
   import type { Strategy, Variant } from "../types";
   import Breadcrumb from "./Breadcrumb.svelte";
   import Logo from "./Logo.svelte";
@@ -89,7 +88,8 @@
         La stratégie de <strong>pairing</strong> est une stratégie qui consiste à regrouper les sommets par paires
         et à choisir le sommet apparié à celui choisi par l'adversaire.
         Cette stratégie appliquée à Breaker permet de garantir un score au plus
-        {@html formulaN4} sur les cycles.
+        <math><mrow><mo>⌈</mo><mfrac><mi>n</mi><mn>4</mn></mfrac><mo>⌉</mo></mrow></math>
+        sur les cycles.
       </p>
     {/if}
   </aside>
