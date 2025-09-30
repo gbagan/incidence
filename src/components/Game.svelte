@@ -1,7 +1,7 @@
 <script lang="ts">
   import { roundedPolygon } from "../geometry";
   import type { Edge, Graph, Strategy, Variant } from "../types";
-  import { countBy, delay, generate, generate2, randomPick, range, repeat } from "../util";
+  import { countBy, delay, generate, generate2, maximaBy, randomPick, range, repeat } from "../util";
   import Breadcrumb from "./Breadcrumb.svelte";
   import Button from "./Button.svelte";
   import Logo from "./Logo.svelte";
@@ -148,23 +148,16 @@
     return deg;
   });
 
-  let nodesSortedByDegree: number[] = $derived.by(() => {
-    const deg = degrees;
-    return range(0, nodeCount).sort((a, b) => deg[b] - deg[a]);
-  });
-
   let maxDegrees = $derived.by(() => {
-    if (strategy !== "degree" || nodesSortedByDegree.length === 0) {
+    if (strategy !== "degree") {
       return null;
     }
-    const max = nodesSortedByDegree.find(i => position[i] === 0);
-    if (max === undefined) {
-      return null;
-    }
-    const d = degrees[max];
-    return range(0, nodeCount).filter(i => position[i] === 0 && degrees[i] === d)
-  });
 
+    return maximaBy(
+      range(0, nodeCount).filter(i => position[i] === 0),
+      i => degrees[i]
+    )
+  });
 
   function computerMove(prevMove: number): number | null {
     const n = position.length;
@@ -271,12 +264,12 @@
           <feMergeNode in="SourceGraphic"/>
         </feMerge>
       </filter>
-      <radialGradient id="gradA" cx="50%" cy="50%" r="50%">
+      <radialGradient id="gradA" cx="50%" cy="50%" r="50%" gradientUnits="userSpaceOnUse">
         <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.9"/>
         <stop offset="100%" stop-color="#1e293b" stop-opacity="1"/>
       </radialGradient>
       <radialGradient id="gradB" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#22c55e" stop-opacity="0.9"/>
+        <stop offset="0%" stop-color="#22c55e" stop-opacity="0.9" gradientUnits="userSpaceOnUse"/>
         <stop offset="100%" stop-color="#1e293b" stop-opacity="1"/>
       </radialGradient>
     </defs>

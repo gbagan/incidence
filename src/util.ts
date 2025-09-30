@@ -41,6 +41,22 @@ export function countBy<A>(arr: A[], pred: (x: A, i: number) => boolean): number
 export const generate2 = <A>(n: number,  m: number, f: (i: number, j: number) => A) => 
   generate(n * m, i => f(i / m | 0, i % m));
 
+export const maximaBy = <A>(arr: A[], f: (a: A) => number): A[] => {
+  let maxVal = -Infinity;
+  const res: A[] = [];
+  for (const a of arr) {
+    const val = f(a);
+    if (val > maxVal) {
+      maxVal = val;
+      res.length = 0;
+      res.push(a);
+    } else if (val === maxVal) {
+      res.push(a);
+    }
+  }
+  return res;
+}
+
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 export function randomPick<A>(arr: A[]): A | null {

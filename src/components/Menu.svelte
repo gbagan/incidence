@@ -1,5 +1,5 @@
 <script lang="ts" generics="A">
-    import Button from './Button.svelte';
+  import Button from './Button.svelte';
 
   type ButtonProp = {
     id: A;
@@ -18,20 +18,20 @@
 </script>
 
 <section class="menu">
-    <p class="desc">{title}</p>
-    <div class="buttons">
-      {#each buttons as btn, i}
-        <Button
-          idx={i}
-          disabled={btn.disabled}
-          onclick={() => select(btn.id)}
-          onpointerenter={() => hover(btn.id)}
-          onpointerleave={() => hover(null)}
-        >
-          {btn.text}
-        </Button>
-      {/each}
-    </div>
+  <p class="desc">{title}</p>
+  <div class="buttons">
+    {#each buttons as {id, text, disabled}, i}
+      <Button
+        idx={i}
+        disabled={disabled}
+        onclick={() => select(id)}
+        onpointerenter={() => hover(id)}
+        onpointerleave={() => hover(null)}
+      >
+        {text}
+      </Button>
+    {/each}
+  </div>
 </section>
 
 <style>
@@ -56,4 +56,3 @@
     justify-content:center
   }
 </style>
-
