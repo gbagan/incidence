@@ -13,7 +13,7 @@ export default defineConfig({
       manifest: {
         name: 'Incidence',
         short_name: 'Incidence',
-        start_url: '/indidence/',
+        start_url: '/incidence/',
         scope: '/incidence/',
         display: 'standalone',
         background_color: '#ffffff',

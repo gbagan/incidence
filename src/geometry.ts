@@ -1,7 +1,21 @@
-export function roundedPolygon(cx: number, cy: number, radius: number, sides: number, cornerAngleDeg: number): string {
+export const roundedRectangle = (x: number, y: number, w: number, h: number, r: number) =>
+  [
+    'M', x + r, y,
+    'H', x + w - r,
+    'A', r, r, 0, 0, 1, x + w, y + r,
+    'V', y + h - r,
+    'A', r, r, 0, 0, 1, x + w - r, y + h,
+    'H', x + r,
+    'A', r, r, 0, 0, 1, x, y + h - r,
+    'V', y + r,
+    'A', r, r, 0, 0, 1, x + r, y,
+    'Z'
+  ].join(' ');
+
+export const roundedPolygon = (cx: number, cy: number, radius: number, sides: number, cornerAngleDeg: number) => {
   const angleStep = (2 * Math.PI) / sides;
   const path = [];
-  const cornerAngle = (cornerAngleDeg * Math.PI) / 180; // portion de cercle mangée au coin
+  const cornerAngle = (cornerAngleDeg * Math.PI) / 180;
 
   for (let i = 0; i < sides; i++) {
     const theta = i * angleStep;

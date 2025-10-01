@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { roundedPolygon } from "../geometry";
+  import { roundedPolygon, roundedRectangle } from "../geometry";
   import type { Edge, Graph, Strategy, Variant } from "../types";
   import { countBy, delay, generate, generate2, maximaBy, randomPick, range, repeat } from "../util";
   import Breadcrumb from "./Breadcrumb.svelte";
@@ -159,7 +159,7 @@
     )
   });
 
-  function computerMove(prevMove: number): number | null {
+  const computerMove = (prevMove: number): number | null => {
     const n = position.length;
     switch (strategy) {
       case "random":
@@ -193,7 +193,7 @@
     }
   }
 
-  async function play(i: number) {
+  const play = async (i: number) => {
     if (position[i] !== 0 || showStrat) {
       return;
     }
@@ -207,23 +207,6 @@
       position = position.with(move, 2);
     }
   }
-
-  function pairPath(x: number, y: number, w: number, h: number) {
-    const r = h / 2;
-    return [
-      'M', x + r, y,
-      'H', x + w - r,
-      'A', r, r, 0, 0, 1, x + w, y + r,
-      'V', y + h - r,
-      'A', r, r, 0, 0, 1, x + w - r, y + h,
-      'H', x + r,
-      'A', r, r, 0, 0, 1, x, y + h - r,
-      'V', y + r,
-      'A', r, r, 0, 0, 1, x + r, y,
-      'Z'
-    ].join(' ');
-  }
-
 </script>
 
 {#snippet pair(u: number, v: number, visible: boolean)}
@@ -237,7 +220,7 @@
   {@const angle = Math.atan2(dy, dx) * 180 / Math.PI}
   {@const midX = (x1 + x2) / 2}
   {@const midY = (y1 + y2) / 2}
-  {@const d = pairPath(-w/2, -h/2, w, h)}
+  {@const d = roundedRectangle(-w/2, -h/2, w, h, h/2)}
   <path
     {d}
     class={["pair", {visible}]}
@@ -264,12 +247,12 @@
           <feMergeNode in="SourceGraphic"/>
         </feMerge>
       </filter>
-      <radialGradient id="gradA" cx="50%" cy="50%" r="50%" gradientUnits="userSpaceOnUse">
+      <radialGradient id="gradA" cx="50%" cy="50%" r="50%">
         <stop offset="0%" stop-color="#7c3aed" stop-opacity="0.9"/>
         <stop offset="100%" stop-color="#1e293b" stop-opacity="1"/>
       </radialGradient>
       <radialGradient id="gradB" cx="50%" cy="50%" r="50%">
-        <stop offset="0%" stop-color="#22c55e" stop-opacity="0.9" gradientUnits="userSpaceOnUse"/>
+        <stop offset="0%" stop-color="#22c55e" stop-opacity="0.9"/>
         <stop offset="100%" stop-color="#1e293b" stop-opacity="1"/>
       </radialGradient>
     </defs>

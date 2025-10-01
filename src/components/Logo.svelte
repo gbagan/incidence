@@ -2,7 +2,7 @@
 </script>
 
 <div class="logo">
-  <svg width="120" height="120" viewBox="0 0 120 120" aria-label="Logo jeu graphe">
+  <svg width="120" height="120" viewBox="0 0 120 120">
     <line x1="60" y1="20" x2="20" y2="60" stroke="#9ca3af" stroke-width="3" />
     <line x1="60" y1="20" x2="100" y2="60" stroke="#9ca3af" stroke-width="3" />
     <line x1="20" y1="60" x2="60" y2="100" stroke="#9ca3af" stroke-width="3" />
@@ -32,16 +32,16 @@
 
 <style>
   .logo {
-    display:flex;
-    flex-direction:column;
-    align-items:center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 1rem;
     width: 12rem;
   }
 
   .logo .title {
     font-size: 1.5rem;
-    font-weight:700;
-    letter-spacing:0.2px
+    font-weight: 700;
+    letter-spacing: 0.2px
   }
 </style>
