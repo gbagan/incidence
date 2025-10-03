@@ -2,6 +2,7 @@
   import type { Strategy, Variant } from "../types";
   import Breadcrumb from "./Breadcrumb.svelte";
   import Button from "./Button.svelte";
+  import Info from "./Info.svelte";
   import Logo from "./Logo.svelte";
   import Menu from "./Menu.svelte";
   import Wrap from "./Wrap.svelte";
@@ -39,8 +40,7 @@
       }
     /> 
   </main>
-  <aside class="info">
-    <h3>À propos du jeu</h3>
+  <Info>
     {#if hover === "random"}
       <p>
         La stratégie aléatoire choisit un sommet au hasard parmi les sommets non déjà choisis.
@@ -66,5 +66,5 @@
         sur les cycles.
       </p>
     {/if}
-  </aside>
+  </Info>
 </Wrap>

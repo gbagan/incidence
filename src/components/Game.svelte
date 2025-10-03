@@ -4,6 +4,7 @@
   import { countBy, delay, generate, generate2, maximaBy, randomPick, range, repeat } from "../util";
   import Breadcrumb from "./Breadcrumb.svelte";
   import Button from "./Button.svelte";
+  import Info from "./Info.svelte";
   import Logo from "./Logo.svelte";
   import Wrap from "./Wrap.svelte";
 
@@ -351,11 +352,10 @@
     </div>
   </main>
 
-  <aside class="info">
-    <h3>À propos du plateau</h3>
+  <Info>
     <p>Blah blah blah Blah blah blah Blah blah blah Blah blah blahBlah blah blah
     </p>
-  </aside>
+  </Info>
 </Wrap>
 
 <style>

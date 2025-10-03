@@ -11,7 +11,7 @@
   let { idx = 2, onclick, onpointerenter, onpointerleave, disabled = false, children }: Props = $props();
 </script>
 
-<button class="btn {idx % 3 === 0 ? "btn1" : idx % 3 === 1 ? "btn2" : "btn3"}"
+<button class={idx % 3 === 0 ? "btn1" : idx % 3 === 1 ? "btn2" : "btn3"}
   disabled={disabled}
   onclick={onclick}
   onpointerenter={onpointerenter}
@@ -21,7 +21,7 @@
 </button>
 
 <style>
-  .btn{
+  button {
     min-width: 10rem;
     padding: 1rem 1.5rem;
     border-radius: 0.7rem;
@@ -32,32 +32,32 @@
     letter-spacing: 0.2px;
     backdrop-filter: blur(6px);
     box-shadow: 0 6px 18px rgba(2,6,23,0.5);
-    transition:transform .14s ease, box-shadow 0.14s ease
-  }
+    transition:transform .14s ease, box-shadow 0.14s ease;
 
-  .btn:disabled {
-      opacity:0.4;
-      cursor:not-allowed;
+    &:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
       pointer-events: not-allowed;
     }
 
-  .btn.btn1{
-    background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(124,58,237,0.14));
-    color:#fff
-  }
+    &.btn1{
+      background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(124,58,237,0.14));
+      color:#fff
+    }
 
-  .btn.btn2{
-    background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(34,197,94,0.08));
-    color:#eafaf0
-  }
+    &.btn2{
+      background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(34,197,94,0.08));
+      color:#eafaf0
+    }
 
-  .btn.btn3{
-    background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(239,68,68,0.08));
-    color:#fff;
-  }
+    &.btn3{
+      background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(239,68,68,0.08));
+      color:#fff;
+    }
 
-  .btn:hover:not(:disabled) {
-    transform:translateY(-0.4rem);
-    box-shadow:0 18px 42px rgba(2,6,23,0.7);
+    &:hover:not(:disabled) {
+      transform:translateY(-0.4rem);
+      box-shadow:0 18px 42px rgba(2,6,23,0.7);
+    }
   }
 </style>

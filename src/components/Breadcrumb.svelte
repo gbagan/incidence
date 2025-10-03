@@ -43,14 +43,13 @@
     top: 0.8rem;
     left:0.8rem;
     padding: 0.4rem 0.8rem;
-    background:rgba(15,23,36,0.92);
+    background: rgba(15,23,36,0.92);
     border: 1px solid #374151;
     border-radius: 0.4rem;
     font-size: 0.8rem;
     color:#a5b4fc;
-  }
-
-  .breadcrumb span {
-    color:#e6eef6;
+    & span {
+      color:#e6eef6;
+    }
   }
 </style>

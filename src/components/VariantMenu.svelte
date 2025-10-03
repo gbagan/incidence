@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Variant } from "../types";
   import Breadcrumb from "./Breadcrumb.svelte";
+    import Info from "./Info.svelte";
   import Logo from "./Logo.svelte";
   import Menu from "./Menu.svelte";
   import Wrap from "./Wrap.svelte";
@@ -28,8 +29,7 @@
       ]}
     />
   </main>
-  <aside class="info">
-    <h3>À propos du jeu</h3>
+  <Info>
     {#if hover === "makermaker"}
       <p>
         Dans la version <strong>Maker-Maker</strong> sur les graphes, une stratégie optimale simple existe pour chacun des joueurs.
@@ -65,5 +65,5 @@
         </li>
       </ul>
     {/if}
-  </aside>
+  </Info>
 </Wrap>

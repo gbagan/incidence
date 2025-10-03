@@ -8,7 +8,7 @@
   }
   
   interface Props {
-    title: String;
+    title: string;
     buttons: ButtonProp[];
     select: (id: A) => void;
     hover: (id: A | null) => void;

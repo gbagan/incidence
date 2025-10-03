@@ -5,6 +5,7 @@
   import Button from "./Button.svelte";
   import Menu from "./Menu.svelte";
   import Wrap from "./Wrap.svelte";
+  import Info from "./Info.svelte";
 
   type Props = {
     variant: Variant;
@@ -37,8 +38,7 @@
       ]}
     />
   </main>
-  <aside class="info">
-    <h3>À propos du jeu</h3>
+  <Info>
     {#if hover === "path"}
       <p>
         Un chemin est une suite de sommets où chaque sommet (sauf les extrémités) 
@@ -83,5 +83,5 @@
         Pour certaines classes, comme les chemins ou les cycles, le jeu possède une stratégie optimale en temps polynomial.
       </p>
     {/if}
-  </aside>
+  </Info>
 </Wrap>

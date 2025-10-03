@@ -39,9 +39,8 @@
     width: 12rem;
   }
 
-  .logo .title {
+  .title {
     font-size: 1.5rem;
     font-weight: 700;
-    letter-spacing: 0.2px
   }
 </style>
