@@ -29,11 +29,11 @@
 
 <nav class="breadcrumb">
   <span>{variantText ?? "?"}</span>
-  {#if strategy}
-    &nbsp;>&nbsp;<span>{strategyText}</span>
-  {/if}
   {#if graph}
     &nbsp;>&nbsp;<span>{graphText}</span>
+  {/if}
+  {#if strategy}
+    &nbsp;>&nbsp;<span>{strategyText}</span>
   {/if}
 </nav>
 
@@ -41,7 +41,7 @@
   .breadcrumb {
     position:absolute;
     top: 0.8rem;
-    left:0.8rem;
+    left: 0.8rem;
     padding: 0.4rem 0.8rem;
     background: rgba(15,23,36,0.92);
     border: 1px solid #374151;
