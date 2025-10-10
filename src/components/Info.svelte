@@ -26,8 +26,8 @@
     </p>
   {:else if variant === "makerbreaker"}
     <p>
-      Dans la version <strong>Maker-Breaker</strong>, Alice (le Maker) cherche à maximiser son score.
-      Bob (le Breaker) cherche à minimiser le score d'Alice.
+      Dans la version <strong>Maker-Breaker</strong>, Alice (Maker) cherche à maximiser son score.
+      Bob (Breaker) cherche à minimiser le score d'Alice.
     </p>
   {/if}
   <h3>Graphe</h3>

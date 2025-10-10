@@ -9,7 +9,7 @@
 
   let graph = $state<Graph>("cycle");
   let variant = $state<Variant>("makerbreaker");
-  let strategy = $state<Strategy>("erdos");
+  let strategy = $state<Strategy>("random");
 
   //let turn: 1 | 2 = $state(1);
   let showStrat = $state(false);

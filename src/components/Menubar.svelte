@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { clickOutside } from "../clickoutside";
   import type { Graph, Strategy, Variant } from "../types";
 
   type Props = {
@@ -24,7 +25,7 @@
     graph === "path" ? "Chemin"
     : graph === "cycle" ? "Cycle"
     : graph === "grid" ? "Grille"
-    : graph === "triangle" ? "Grille triangulaire"
+    : graph === "triangle" ? "Triangulaire"
     : "Hypergraphe";
 
   const variants:  Variant[] = ["makermaker", "makerbreaker"];
@@ -43,25 +44,6 @@
   );
 
   let active: number | null = $state(null);
-
-  export function clickOutside(node: Node) {
-	// the node has been mounted in the DOM
-	
-	window.addEventListener('click', handleClick);
-	
-	function handleClick(e: MouseEvent) {   
-      if (!node.contains(e.target as Node)) {
-        node.dispatchEvent(new CustomEvent('click_outside'))
-      }
-    }
-
-	  return {
-	    destroy() {
-		    window.removeEventListener('click', handleClick)
-	    }
-	  };
-  }
-
 </script>
     
 <div class="menubar">
@@ -70,10 +52,16 @@
       <span>🚀</span>
       <span>Incidence</span>
     </div>
-    <div class="dropdown-container" use:clickOutside onclick_outside={() => active = null}>
+    <div
+      class="dropdown-container"
+      {@attach clickOutside(() => active = null)}
+    >
       <div class="dropdown">
-      <button class={["button", {active: active === 0}]} onclick={() => active = 0}>
-        {variantText(variant)}
+      <button
+        class={["button", {active: active === 0}]}
+        onclick={() => active = active === null ? 0 : null}
+      >
+        Variante: {variantText(variant)}
       </button>
       <div class={["menu", {show: active === 0}]}>
         {#each variants as v}
@@ -86,8 +74,11 @@
         </div>
       </div>
       <div class="dropdown">
-        <button class={["button", {active: active === 1}]} onclick={() => active = 1}>
-          {graphText(graph)}
+        <button
+          class={["button", {active: active === 1}]}
+          onclick={() => active = active === null ? 1 : null}
+        >
+          Graphe: {graphText(graph)}
         </button>
         <div class={["menu", {show: active === 1}]}>
           {#each graphs as g}
@@ -100,8 +91,11 @@
         </div>
       </div>
       <div class="dropdown">
-        <button class={["button", {active: active === 2}]} onclick={() => active = 2}>
-          {strategyText(strategy)}
+        <button
+          class={["button", {active: active === 2}]}
+          onclick={() => active = active === null ? 2 : null}
+        >
+          Stratégie: {strategyText(strategy)}
         </button>
         <div class={["menu", {show: active === 2}]}>
           {#each strategies as [st, disabled]}
@@ -118,6 +112,17 @@
 </div> 
 
 <style>
+  .app-logo {
+    padding: 0.7rem 1.2rem;
+    color: #667eea;
+    font-size: 1.2rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-right: 20px;
+  }
+
   .menubar {
     width: 100%;
     background: linear-gradient(135deg, #2d2d44 0%, #1f1f35 100%);
@@ -153,9 +158,9 @@
     transition: all 0.2s ease;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 0.5rem;
     border-radius: 0;
-    min-width: 10rem;
+    min-width: 13rem;
 
     &:hover {
       background: rgba(102, 126, 234, 0.15);
