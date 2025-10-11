@@ -1,6 +1,7 @@
 <script lang="ts">
     import { clickOutside } from "../clickoutside";
   import type { Graph, Strategy, Variant } from "../types";
+    import Logo from "./Logo.svelte";
 
   type Props = {
     variant: Variant;
@@ -12,6 +13,8 @@
   };
   
   let { variant, graph, strategy, setVariant, setGraph, setStrategy }: Props = $props();
+
+  let show = $state(false);
 
   const variantText = (variant: Variant) => variant === "makermaker" ? "Maker-Maker" : variant ? "Maker-Breaker" : "";
   const strategyText = (strategy: Strategy) =>
@@ -48,12 +51,12 @@
     
 <div class="menubar">
   <div class="content">
-    <div class="app-logo">
-      <span>🚀</span>
+    <div class="app-title">
+      <span class="logo"><Logo /></span>
       <span>Incidence</span>
     </div>
     <div
-      class="dropdown-container"
+      class={[ "dropdown-container", {show}]}
       {@attach clickOutside(() => active = null)}
     >
       <div class="dropdown">
@@ -108,19 +111,24 @@
         </div>
       </div>
     </div>
+    <button class="button menu-btn" onclick={() => show = !show}>☰</button>
   </div>
 </div> 
 
 <style>
-  .app-logo {
-    padding: 0.7rem 1.2rem;
+  .app-title {
+    padding: 0rem 1.2rem;
     color: #667eea;
     font-size: 1.2rem;
     font-weight: bold;
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-right: 20px;
+    gap: 1rem;
+  }
+
+  .logo {
+    width: 2.5rem;
+    height: 2.5rem;
   }
 
   .menubar {
@@ -179,11 +187,11 @@
     left: 0;
     background: #2d2d44;
     min-width: 13rem;
-    border-radius: 0 0 8px 8px;
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+    border-radius: 0 0 0.5rem 0.5rem;
+    box-shadow: 0 0.5rem 1.8rem rgba(0, 0, 0, 0.5);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-10px);
+    transform: translateY(-0.7rem);
     transition: all 0.2s ease;
     z-index: 1000;
     overflow: hidden;
@@ -198,7 +206,7 @@
   }
 
   .item {
-    padding: 12px 20px;
+    padding: 0.7rem 1.1rem;
     color: #e0e0e0;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -223,4 +231,40 @@
       font-size: 0.8rem;
     }
   }
+
+  .menu-btn {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    .dropdown-container {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 2.5rem;
+      right: 1rem;
+      padding: 1rem;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #2d2d44 0%, #1f1f35 100%);
+      border: 1px solid #333;
+    }
+
+    .dropdown-container.show {
+      z-index: 10;
+      display: flex;
+    }
+
+    .menu-btn {
+      position: absolute;
+      right: 0rem;
+      display: block;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.8rem;
+      cursor: pointer;
+      min-width: 3rem;
+    }
+}
+  
 </style>

@@ -2,13 +2,11 @@
   interface Props {
     idx?: number;
     onclick: () => void;
-    onpointerenter?: () => void;
-    onpointerleave?: () => void;
     disabled?: boolean;
     children: () => any;
   }
 
-  let { idx = 2, onclick, onpointerenter, onpointerleave, disabled = false, children }: Props = $props();
+  let { idx = 2, onclick, disabled = false, children }: Props = $props();
 </script>
 
 <button class={idx % 3 === 0 ? "btn1" : idx % 3 === 1 ? "btn2" : "btn3"}
@@ -31,7 +29,7 @@
     font-size: 1rem;
     letter-spacing: 0.2px;
     backdrop-filter: blur(6px);
-    box-shadow: 0 6px 18px rgba(2,6,23,0.5);
+    box-shadow: 0 0.4rem 1rem rgba(2,6,23,0.5);
     transition:transform .14s ease, box-shadow 0.14s ease;
 
     &:disabled {

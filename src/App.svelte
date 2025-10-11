@@ -5,7 +5,8 @@
   import Menubar from "./components/Menubar.svelte";
   import Button from "./components/Button.svelte";
   import Info from "./components/Info.svelte";
-  import Logo from "./components/Logo.svelte";
+  // import Logo from "./components/Logo.svelte";
+  import Peg from "./components/Peg.svelte";
 
   let graph = $state<Graph>("cycle");
   let variant = $state<Variant>("makerbreaker");
@@ -333,10 +334,8 @@
         class="nonplayed"
         onclick={() => play(i)}
       />
-      {#if position[i] === 1}
-        <circle cx={x} cy={y} r="18" fill="url(#gradA)" stroke="#7c3aed" stroke-width="3" />
-      {:else if position[i] === 2}
-        <circle cx={x} cy={y} r="18" fill="url(#gradB)" stroke="#22c55e" stroke-width="3" />
+      {#if position[i] !== 0}
+        <Peg {x} {y} color={position[i]} />
       {/if}
     {/each}
   </svg>
@@ -348,17 +347,13 @@
     setGraph={g => {graph = g; restart() }}
     setStrategy={s => { strategy = s; restart() }}
   />
-  <div class="hflex">
+  <div class="wrap">
     <main class="center-card">
-      <Logo/>
-      <div class="backbutton">
-        <Button onclick={restart}>Recommencer</Button>
-      </div>
-
       <div class="board-wrap">
         <div class="scores">
           <span class="score1">Score d'Alice: {score1}</span>
           <span class="score2">Score de Bob: {variant === "makerbreaker" ? "ø" : score2}</span>
+          <Button onclick={restart}>Recommencer</Button>
         </div>
         {@render board()}
       </div>
@@ -368,17 +363,19 @@
 </div>
 
 <style>
-  .hflex {
+  .wrap {
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  
-  .backbutton {
-    position: absolute;
-    left: 2rem;
-    bottom: 2rem;
+
+  @media (orientation: portrait) {
+    .wrap {
+      flex-direction: column;
+      gap: 1.5rem;
+    }
   }
+
 
   .board-wrap {
     display: flex;
@@ -394,6 +391,28 @@
     justify-content: space-around;
   }
 
+  .center-card {
+    position: relative;
+    min-width: 20rem;
+    max-width: 60rem;
+    margin: 0 auto;
+    background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    border-radius: 0.8rem;
+    box-shadow: var(--shadow);
+    padding: 2.5rem;
+    display: flex;
+    gap: 2rem;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .logo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+  }
+
   .score1 {
     color: rgba(124,58,237, 0.9);
   }
@@ -403,8 +422,8 @@
   }
 
   .board {
-    width: 80vmin;
-    height: 80vmin;
+    width: 75vmin;
+    height: 75vmin;
     background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
     border-radius: 0.8rem;
     padding: 1rem;

@@ -110,7 +110,7 @@
     border-radius: 1rem;
     padding: 1.5rem;
     box-shadow: 0 8px 30px rgba(3,8,20,0.6);
-    width: 30rem;
+    width: 48vw;
     min-height: 30rem;
     
     & h3 {
@@ -128,5 +128,11 @@
       font-weight: bold;
       color: #e6eef6;
     }
-}
+  }
+  
+  @media (orientation: portrait) {
+    .info {
+      display: none;
+    }
+  }
 </style>
