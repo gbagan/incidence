@@ -15,8 +15,12 @@
   let { variant, graph, strategy, setVariant, setGraph, setStrategy }: Props = $props();
 
   let show = $state(false);
+  let active: number | null = $state(null);
 
-  const variantText = (variant: Variant) => variant === "makermaker" ? "Maker-Maker" : variant ? "Maker-Breaker" : "";
+  const variantText = (variant: Variant) =>
+    variant === "makermaker" ? "Maker-Maker" 
+    : variant === "maker" ? "Maker" 
+    : "Breaker";
   const strategyText = (strategy: Strategy) =>
     strategy === "random" ? "Aléatoire"
     : strategy === "erdos" ? "Erdős-Selfridge"
@@ -31,7 +35,7 @@
     : graph === "triangle" ? "Triangulaire"
     : "Hypergraphe";
 
-  const variants:  Variant[] = ["makermaker", "makerbreaker"];
+  const variants:  Variant[] = ["makermaker", "maker", "breaker"];
   const graphs: Graph[] = ["path", "cycle", "grid", "triangle", "hypergraph"];
   
   const strategies: [Strategy, boolean][]  = $derived(
@@ -42,11 +46,9 @@
     ] : [
       ["random", false],
       ["erdos", false],
-      ["pairing", graph !== "path" && graph !== "cycle"],
+      ["pairing", variant === "breaker" || graph !== "path" && graph !== "cycle"],
     ]
   );
-
-  let active: number | null = $state(null);
 </script>
     
 <div class="menubar">
@@ -57,7 +59,7 @@
     </div>
     <div
       class={[ "dropdown-container", {show}]}
-      {@attach clickOutside(() => active = null)}
+      {@attach clickOutside(() => { active = null; show = false})}
     >
       <div class="dropdown">
       <button
@@ -70,7 +72,7 @@
         {#each variants as v}
         <!-- svelte-ignore a11y_click_events_have_key_events -->
         <!-- svelte-ignore a11y_no_static_element_interactions -->
-        <div class="item" onclick={() => {active = null; setVariant(v)}}>
+        <div class="item" onclick={() => {active = null; show = false; setVariant(v)}}>
           {variantText(v)}
         </div>
         {/each}
@@ -87,7 +89,7 @@
           {#each graphs as g}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <div class="item" onclick={() => {active = null; setGraph(g)}}>
+            <div class="item" onclick={() => {active = null; show = false; setGraph(g)}}>
               {graphText(g)}
             </div>
           {/each}
@@ -104,7 +106,7 @@
           {#each strategies as [st, disabled]}
             <!-- svelte-ignore a11y_click_events_have_key_events -->
             <!-- svelte-ignore a11y_no_static_element_interactions -->
-            <div class={["item", {disabled}]} onclick={() => {active = null; setStrategy(st)}}>
+            <div class={["item", {disabled}]} onclick={() => {active = null; show = false; setStrategy(st)}}>
               {strategyText(st)}
             </div>
           {/each}
@@ -236,7 +238,7 @@
     display: none;
   }
 
-  @media (max-width: 768px) {
+  @media (orientation: portrait) {
     .dropdown-container {
       display: none;
       flex-direction: column;
@@ -262,6 +264,7 @@
       border: none;
       color: #fff;
       font-size: 1.8rem;
+      padding: 0.2rem;
       cursor: pointer;
       min-width: 3rem;
     }

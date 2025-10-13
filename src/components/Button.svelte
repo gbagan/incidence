@@ -12,8 +12,6 @@
 <button class={idx % 3 === 0 ? "btn1" : idx % 3 === 1 ? "btn2" : "btn3"}
   disabled={disabled}
   onclick={onclick}
-  onpointerenter={onpointerenter}
-  onpointerleave={onpointerleave}
 >
   {@render children()}
 </button>

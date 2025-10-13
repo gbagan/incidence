@@ -24,7 +24,7 @@
       Dans la version <strong>Maker-Maker</strong>, Alice cherche à maximiser la différence entre son score et celui de Bob.
       Bob cherche à la minimiser.
     </p>
-  {:else if variant === "makerbreaker"}
+  {:else}
     <p>
       Dans la version <strong>Maker-Breaker</strong>, Alice (Maker) cherche à maximiser son score.
       Bob (Breaker) cherche à minimiser le score d'Alice.
@@ -109,9 +109,10 @@
     background: var(--card);
     border-radius: 1rem;
     padding: 1.5rem;
-    box-shadow: 0 8px 30px rgba(3,8,20,0.6);
+    box-shadow: 0 0.5rem 1.8rem rgba(3,8,20,0.6);
     width: 48vw;
     min-height: 30rem;
+    overflow: auto;
     
     & h3 {
       margin: 0 0 0.7rem 0;

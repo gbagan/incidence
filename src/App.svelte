@@ -9,7 +9,7 @@
   import Peg from "./components/Peg.svelte";
 
   let graph = $state<Graph>("cycle");
-  let variant = $state<Variant>("makerbreaker");
+  let variant = $state<Variant>("makermaker");
   let strategy = $state<Strategy>("random");
 
   //let turn: 1 | 2 = $state(1);
@@ -97,8 +97,8 @@
 
   let position = $derived(repeat(nodeCount, 0));
 
-  let restart = () => {
-    if (strategy === "pairing" && graph !== "path" && graph !== "cycle"
+  let restart = async () => {
+    if (strategy === "pairing" && (variant === "breaker" || graph !== "path" && graph !== "cycle")
       || strategy === "degree" && graph === "hypergraph"
     ) {
       strategy = "random";
@@ -106,7 +106,18 @@
 
     position = repeat(nodeCount, 0);
     //turn = 1;
-    showStrat = false;
+    if (variant !== "breaker") {
+      showStrat = false;
+    } else {
+      showStrat = true;
+      await delay(1000);
+      showStrat = false;
+      let move = computerMove(null);
+      if (move !== null) {
+        position = position.with(move, 1);
+      }
+    }
+
   }
 
 
@@ -168,7 +179,7 @@
     )
   });
 
-  const computerMove = (prevMove: number): number | null => {
+  const computerMove = (prevMove: number | null): number | null => {
     const n = position.length;
     switch (strategy) {
       case "random":
@@ -203,17 +214,19 @@
   }
 
   const play = async (i: number) => {
+    let turn = variant === "breaker" ? 2 : 1;
+    let oppositeTurn = turn === 1 ? 2 : 1;
+
     if (position[i] !== 0 || showStrat) {
       return;
     }
-    position = position.with(i, 1);
-    //turn = turn === 1 ? 2 : 1;
+    position = position.with(i, turn);
     showStrat = true;
     await delay(1000);
     showStrat = false;
     let move = computerMove(i);
     if (move !== null) {
-      position = position.with(move, 2);
+      position = position.with(move, oppositeTurn);
     }
   }
 </script>
@@ -352,7 +365,7 @@
       <div class="board-wrap">
         <div class="scores">
           <span class="score1">Score d'Alice: {score1}</span>
-          <span class="score2">Score de Bob: {variant === "makerbreaker" ? "ø" : score2}</span>
+          <span class="score2">Score de Bob: {variant !== "makermaker" ? "ø" : score2}</span>
           <Button onclick={restart}>Recommencer</Button>
         </div>
         {@render board()}
