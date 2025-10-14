@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { clickOutside } from "../clickoutside";
+  import { clickOutside } from "../clickoutside";
   import type { Graph, Strategy, Variant } from "../types";
-    import Logo from "./Logo.svelte";
+  import Logo from "./Logo.svelte";
 
   type Props = {
     variant: Variant;
@@ -59,7 +59,7 @@
     </div>
     <div
       class={[ "dropdown-container", {show}]}
-      {@attach clickOutside(() => { active = null; show = false})}
+      {@attach clickOutside(() => active = null)}
     >
       <div class="dropdown">
       <button
@@ -135,7 +135,7 @@
 
   .menubar {
     width: 100%;
-    background: linear-gradient(135deg, #2d2d44 0%, #1f1f35 100%);
+    background: linear-gradient(135deg, var(--darkblue) 0%, #1f1f35 100%);
     box-shadow: 0 0.25rem 1.5rem rgba(0, 0, 0, 0.5);
     border-bottom: 1px solid #404060;
   }
@@ -187,7 +187,7 @@
     position: absolute;
     top: 100%;
     left: 0;
-    background: #2d2d44;
+    background: var(--darkblue);
     min-width: 13rem;
     border-radius: 0 0 0.5rem 0.5rem;
     box-shadow: 0 0.5rem 1.8rem rgba(0, 0, 0, 0.5);

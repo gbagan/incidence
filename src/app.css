@@ -1,8 +1,11 @@
+@import "open-props/colors.min.css";
+
 :root{
   --bg:#0f1724; 
   --card:#0b1220;
   --accent:#7c3aed;
   --muted:#9aa4b2;
+  --darkblue: #2d2d44;
   --glass: rgba(255,255,255,0.04);
    --shadow: 0 0.5rem 1.5rem rgba(2,6,23,0.6);
   font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;

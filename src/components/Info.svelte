@@ -110,8 +110,9 @@
     border-radius: 1rem;
     padding: 1.5rem;
     box-shadow: 0 0.5rem 1.8rem rgba(3,8,20,0.6);
-    width: 48vw;
+    width: 45vw;
     min-height: 30rem;
+    max-height: 75vh;
     overflow: auto;
     
     & h3 {

@@ -1,59 +1,28 @@
 <script lang="ts">
   interface Props {
-    idx?: number;
-    onclick: () => void;
-    disabled?: boolean;
+    onclick?: () => void;
     children: () => any;
   }
 
-  let { idx = 2, onclick, disabled = false, children }: Props = $props();
+  let { onclick, children }: Props = $props();
 </script>
 
-<button class={idx % 3 === 0 ? "btn1" : idx % 3 === 1 ? "btn2" : "btn3"}
-  disabled={disabled}
-  onclick={onclick}
->
+<button {onclick}>
   {@render children()}
 </button>
 
 <style>
   button {
-    min-width: 10rem;
-    padding: 1rem 1.5rem;
-    border-radius: 0.7rem;
-    border: none;
-    cursor: pointer;
-    font-weight: 700;
-    font-size: 1rem;
-    letter-spacing: 0.2px;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 0.4rem 1rem rgba(2,6,23,0.5);
-    transition:transform .14s ease, box-shadow 0.14s ease;
+    width: 2.5rem;              /* w-12 */
+    height: 2.5rem;             /* h-12 */
+    color: #f3f4f6;
+    background-color: var(--gray-8); /* bg-gray-700 */
+    border: 1px solid var(--gray-7); /* border + border-gray-600 */
+    border-radius: 0.25rem;   /* rounded */
+    transition: background-color 0.2s ease; /* transition-colors */
+  }
 
-    &:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-      pointer-events: not-allowed;
-    }
-
-    &.btn1{
-      background:linear-gradient(90deg, rgba(255,255,255,0.03), rgba(124,58,237,0.14));
-      color:#fff
-    }
-
-    &.btn2{
-      background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(34,197,94,0.08));
-      color:#eafaf0
-    }
-
-    &.btn3{
-      background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(239,68,68,0.08));
-      color:#fff;
-    }
-
-    &:hover:not(:disabled) {
-      transform:translateY(-0.4rem);
-      box-shadow:0 18px 42px rgba(2,6,23,0.7);
-    }
+  button:hover {
+    background-color: var(--gray-7); /* hover:bg-gray-600 */
   }
 </style>
