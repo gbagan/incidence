@@ -1,5 +1,3 @@
-import { repeat } from "./util";
-
 const computeTable = (n: number, scoreFn: (conf: number, n: number) => number) => {
   const score_table = new Uint8Array(3 << (2 * (n-1)));
   score_table.fill(255);
@@ -68,44 +66,59 @@ function scoreFnForLemma26(conf: number): number {
 }
 
 class PathStruct {
-  table: Uint8Array;
+  size: number;
+  baseTable: Uint8Array;
   lemma26Table: Uint8Array;
-  games: (0 | 1 | 2)[][]
+  lemma26Games: number[]
+  baseGame: number;
 
   constructor(n: number) {
-    this.games = [];
-    while (n > 0) {
-      this.games.push(repeat(n, 0) as (0 | 1 | 2)[]);
+    this.size = n;
+    this.lemma26Games = [];
+    while (n > 5) {
+      this.lemma26Games.push(0);
       n -= 5;
     }
-    this.table = computeTable(n + 5, scoreFn);
+    this.baseTable = computeTable(n, scoreFn);
     this.lemma26Table = computeTable(7, scoreFnForLemma26);
+    this.baseGame = 0;
   }
 
   breakerMove(prevMove: number, depth: number = 0): number {
-    const game = this.games[depth];
-    const n = game.length;
-    game[prevMove] = 1;
+    const n = this.size - 5 * depth;
     if (n <= 5) {
-      const encoding = game.reduce((acc: number, v, i) => acc | (v << (2 * i)), 0);
-      const move = this.table[encoding];
-      game[move] = 2;
+      this.baseGame |= 1 << (2 * prevMove);
+      const move = this.baseTable[this.baseGame];
+      this.baseGame |= 2 << (2 * move);
       return move;
     } else if (prevMove < n - 6) {
-      const m = this.breakerMove(prevMove, depth+1);
-      game[m] = 2;
-      return m;
+      return this.breakerMove(prevMove, depth+1);
     } else {
       // Lemma 26
       const m = n - 6;
-      const encoding =
-        game.slice(m).reduce((acc: number, v, i) => acc | (v << (2 * i)), 0);
-        + this.games[depth+1][m] << 12;
-      const move = this.lemma26Table[encoding];
-      game[move + m] = 2;
-      return move + m;
+      let game = this.lemma26Games[depth]
+      game |= 1 << (2 * (prevMove - m));
+      const move = this.lemma26Table[game];
+      game |= 2 << (2 * move);
+      this.lemma26Games[depth] = game;
+      if (move === 6) { // u0 prime
+        return this.breakerMove(m, depth+1)
+      } else {
+        return move + m;
+      }
     }
   }
 }
 
+/*
+let strat =  new PathStruct(12);
+//let m = strat.breakerMove(2);
+//console.log("answer to 2, m =", m);
+//let m2 = strat.breakerMove(3);
+//console.log("answer to 3, m2 =", m2);
+let m3 = strat.breakerMove(9);
+console.log("answer to 9, m3 =", m3);
+
+
 // table 15: 1400 ms
+*/

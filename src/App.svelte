@@ -1,4 +1,6 @@
 <script lang="ts">
+import "./strategy";
+
   import { Plus, Minus, RotateCcw } from '@lucide/svelte';
   import type { Edge, Graph, Strategy, Variant } from "./types";
   import { countBy, delay, generate, generate2, maximaBy, randomPick, range, repeat } from "./util";
@@ -315,7 +317,7 @@
     background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
     border-radius: 0.8rem;
     box-shadow: var(--shadow);
-    padding: 2.5rem;
+    padding: 2rem;
     display: flex;
     gap: 2rem;
     align-items: center;
