@@ -65,7 +65,7 @@ function scoreFnForLemma26(conf: number): number {
   return score + (u0 === 1 && u0prime === 1 ? 1 : 0);
 }
 
-class BrekerStrategy {
+export class BreakerStrategy {
   size: number;
   baseTable: Uint8Array;
   lemma26Table: Uint8Array;
@@ -121,7 +121,7 @@ class BrekerStrategy {
   }
 }
 
-let strat =  new BrekerStrategy(7);
+let strat =  new BreakerStrategy(7);
 let m1 = strat.breakerMove(1);
 console.log("answer to 1, m1 =", m1);
 let m2 = strat.breakerMove(0);

@@ -1,9 +1,8 @@
 <script lang="ts">
-import "./strategy";
-
   import { RotateCcw } from '@lucide/svelte';
   import type { Edge, Graph, Strategy, Variant } from "./types";
   import { countBy, delay, generate, generate2, maximaBy, randomPick, range, repeat } from "./util";
+  import { BreakerStrategy } from "./strategy";
   import Menubar from "./components/Menubar.svelte";
   import Button from "./components/Button.svelte";
   import Info from "./components/Info.svelte";
@@ -123,9 +122,16 @@ import "./strategy";
 
   let position = $derived(repeat(nodeCount, 0));
 
+  let strategyObj: BreakerStrategy | null = $derived(
+    graph !== "path" || variant !== "maker" || strategy !== "optimal"
+    ? null
+    : new BreakerStrategy(nodeCount)
+  )
+
   let restart = async () => {
     if (strategy === "pairing" && (variant === "breaker" || graph !== "path" && graph !== "cycle")
       || strategy === "degree" && graph === "hypergraph"
+      || strategy === "optimal" && graph !== "path"
     ) {
       strategy = "random";
     }
@@ -236,6 +242,11 @@ import "./strategy";
           }
         }
         return randomPick(range(0, n).filter(i => position[i] === 0));
+      case "optimal":
+        if (prevMove === null) { // todo
+          return null;
+        }
+        return strategyObj?.breakerMove(prevMove) ?? null
     }
   }
 
@@ -343,13 +354,6 @@ import "./strategy";
     gap: 2rem;
     align-items: center;
     justify-content: center;
-  }
-
-  .logo-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2rem;
   }
 
   .score1 {

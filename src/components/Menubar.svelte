@@ -26,7 +26,7 @@
     : strategy === "erdos" ? "Erdős-Selfridge"
     : strategy === "pairing" ? "Pairing"
     : strategy === "degree" ? "Optimale"
-    : "";
+    : "Optimale";
 
   const graphText = (graph: Graph) =>
     graph === "path" ? "Chemin"
@@ -47,6 +47,7 @@
       ["random", false],
       ["erdos", false],
       ["pairing", variant === "breaker" || graph !== "path" && graph !== "cycle"],
+      ["optimal", variant !== "maker" || graph !== "path"],
     ]
   );
 </script>
