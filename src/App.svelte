@@ -1,7 +1,7 @@
 <script lang="ts">
 import "./strategy";
 
-  import { Plus, Minus, RotateCcw } from '@lucide/svelte';
+  import { RotateCcw } from '@lucide/svelte';
   import type { Edge, Graph, Strategy, Variant } from "./types";
   import { countBy, delay, generate, generate2, maximaBy, randomPick, range, repeat } from "./util";
   import Menubar from "./components/Menubar.svelte";
@@ -9,23 +9,47 @@ import "./strategy";
   import Info from "./components/Info.svelte";
   // import Logo from "./components/Logo.svelte";
   import Board from './components/Board.svelte';
+  import Resize from "./components/Resize.svelte";
 
   let graph = $state<Graph>("cycle");
   let variant = $state<Variant>("makermaker");
   let strategy = $state<Strategy>("random");
 
+  let sizeLimit = $derived.by(() => {
+    switch (graph) {
+      case "path":
+      case "cycle": return { rowMin: 1, rowMax: 1, colMin: 5, colMax: 30 };
+      case "grid": return { rowMin: 2, rowMax: 8, colMin: 2, colMax: 8 };
+      case "triangle":
+      case "hypergraph": return { rowMin: 2, rowMax: 10, colMin: 2, colMax: 8 };
+    }
+  });
+
+
   //let turn: 1 | 2 = $state(1);
   let showStrat = $state(false);
 
-  let nodeCount = $derived.by(() => {
+  let rowCount = $derived.by(() => {
     switch (graph) {
-      case "path": return 24;
-      case "cycle": return 20;
-      case "grid": return 64;
-      case "triangle": return 80;
-      case "hypergraph": return 80;
+      case "path":
+      case "cycle": return 1;
+      case "grid": return 8;
+      case "triangle":
+      case "hypergraph": return 10;
     }
   });
+
+  let colCount = $derived.by(() => {
+    switch (graph) {
+      case "path":
+      case "cycle": return 18;
+      case "grid":
+      case "triangle":
+      case "hypergraph": return 8;
+    }
+  });
+
+  let nodeCount = $derived(colCount * rowCount);
 
   let nodes: {x: number, y: number}[] = $derived.by(() => {
     switch (graph) {
@@ -42,7 +66,7 @@ import "./strategy";
           return { x, y };
         });
       case "grid":
-        return generate2(8, 8, (row, col) => ({x: 40 + 75 * col, y: 40 + 75 * row}));
+        return generate2(rowCount, colCount, (row, col) => ({x: 40 + 75 * col, y: 40 + 75 * row}));
       case "triangle":
       case "hypergraph":
         const h = Math.sqrt(3) / 2;
@@ -55,8 +79,8 @@ import "./strategy";
       case "path": return generate(nodeCount - 1, i => [i, i + 1]);
       case "cycle": return generate(nodeCount, i => [i, (i+1) % nodeCount]);
       case "grid": return [
-        ...generate2(8, 7, (i, j) => [8 * i + j, 8 * i + j + 1] as Edge),
-        ...generate2(7, 8, (i, j) => [8 * i + j, 8 * i + j + 8] as Edge)
+        ...generate2(rowCount, colCount-1, (i, j) => [colCount * i + j, colCount * i + j + 1] as Edge),
+        ...generate2(rowCount-1, colCount, (i, j) => [colCount * i + j, colCount * i + j + colCount] as Edge)
       ];
       case "triangle":
       case "hypergraph":
@@ -231,6 +255,14 @@ import "./strategy";
       position = position.with(move, oppositeTurn);
     }
   }
+
+  const resize = (r: number, c: number) => {
+    if (r < sizeLimit.rowMin || r > sizeLimit.rowMax || c < sizeLimit.colMin || c > sizeLimit.colMax) {
+      return;
+    }
+    rowCount = r;
+    colCount = c;
+  }
 </script>
 
 <div class="vflex">
@@ -248,18 +280,7 @@ import "./strategy";
           <Button onclick={restart}><RotateCcw size={20} /></Button>
         </div>
         <div class="resizable-board">
-          <div class="resize-container">
-            <span class="resize-title">Largeur: 8</span>
-            <div class="resize-buttons">
-              <Button onclick={() => {}}><Minus size={20} /></Button>
-              <Button onclick={() => {}}><Plus size={20} /></Button>
-            </div>
-            <span class="resize-title">Hauteur: 8</span>
-            <div class="resize-buttons">
-              <Button onclick={() => {}}><Minus size={20} /></Button>
-              <Button onclick={() => {}}><Plus size={20} /></Button>
-            </div>
-          </div>
+          <Resize {rowCount} {colCount} {sizeLimit} {resize} />
           <Board
             {nodes}
             {edges}
@@ -343,22 +364,5 @@ import "./strategy";
     display: flex;
     align-items: center;
     gap: 1rem;
-  }
-
-  .resize-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .resize-buttons {
-    display: flex;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-  }
-
-  .resize-title {
-    color: #e0e0e0;
   }
 </style>

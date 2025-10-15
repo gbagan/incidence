@@ -65,7 +65,7 @@ function scoreFnForLemma26(conf: number): number {
   return score + (u0 === 1 && u0prime === 1 ? 1 : 0);
 }
 
-class PathStruct {
+class BrekerStrategy {
   size: number;
   baseTable: Uint8Array;
   lemma26Table: Uint8Array;
@@ -86,22 +86,33 @@ class PathStruct {
 
   breakerMove(prevMove: number, depth: number = 0): number {
     const n = this.size - 5 * depth;
+    const m = n - 6;
     if (n <= 5) {
       this.baseGame |= 1 << (2 * prevMove);
       const move = this.baseTable[this.baseGame];
       this.baseGame |= 2 << (2 * move);
       return move;
-    } else if (prevMove < n - 6) {
-      return this.breakerMove(prevMove, depth+1);
+    } else if (prevMove < m) {
+      const move = this.breakerMove(prevMove, depth+1);
+      if (move < m) {
+        return move;
+      } else {
+        // Lemma 26, Left has played on u0'
+        let game = this.lemma26Games[depth];
+        game |= 1 << (2 * 6);
+        const answer = this.lemma26Table[game];
+        game |= 2 << (2 * answer);
+        this.lemma26Games[depth] = game;
+        return answer + m;
+      }
     } else {
-      // Lemma 26
-      const m = n - 6;
+      // Lemma 26, Left has played on {u0, ..., u5}
       let game = this.lemma26Games[depth]
       game |= 1 << (2 * (prevMove - m));
       const move = this.lemma26Table[game];
       game |= 2 << (2 * move);
       this.lemma26Games[depth] = game;
-      if (move === 6) { // u0 prime
+      if (move === 6) { // u0'
         return this.breakerMove(m, depth+1)
       } else {
         return move + m;
@@ -110,15 +121,12 @@ class PathStruct {
   }
 }
 
-/*
-let strat =  new PathStruct(12);
-//let m = strat.breakerMove(2);
-//console.log("answer to 2, m =", m);
-//let m2 = strat.breakerMove(3);
-//console.log("answer to 3, m2 =", m2);
-let m3 = strat.breakerMove(9);
-console.log("answer to 9, m3 =", m3);
-
-
-// table 15: 1400 ms
-*/
+let strat =  new BrekerStrategy(7);
+let m1 = strat.breakerMove(1);
+console.log("answer to 1, m1 =", m1);
+let m2 = strat.breakerMove(0);
+console.log("answer to 0, m2 =", m2);
+let m3 = strat.breakerMove(5);
+console.log("answer to 5, m3 =", m3);
+let m4 = strat.breakerMove(3);
+console.log("answer to 3, m4 =", m4);
