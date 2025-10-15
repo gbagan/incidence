@@ -1,7 +1,8 @@
-- [x] Pouvoir redimensionner les graphes
+- [x] Pouvoir redimensionner les graphes
 - [ ] Réinitialiser la stratégie optimale sur chemin si on reset la partie
 - [x] Coups optimaux pour Breaker sur chemin
 - [ ] Coups optimaux pour Maker sur chemin
 - [ ] Coups optimaux pour cycle
 - [ ] Finir la partie quand aucun coup ne rapporte des points
 - [ ] Graphe avec des degrés variés
+- [ ] Ne pas autoriser la machine à jouer si la partie est finie

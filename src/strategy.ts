@@ -44,10 +44,11 @@ const computeTable = (n: number, scoreFn: (conf: number, n: number) => number) =
   }
 
   backtrack(0, 0);
+  console.log(score_table[0]);
   return move_table;
 }
 
-function scoreFn(conf: number, n: number): number {
+function standardScore(conf: number, n: number): number {
   let score = 0;
   for (let i = 0; i < n-1; i++) {
     const v = (conf >> (2 * i)) & 15;
@@ -58,28 +59,40 @@ function scoreFn(conf: number, n: number): number {
   return score;
 }
 
+const scoreWithLeftBorder = (conf: number, n: number)  =>
+  standardScore(conf, n) + (((conf & 3) === 1) ? 1 : 0);
+
+const cycleScore = (conf: number, n: number)  =>
+  standardScore(conf, n) + ((conf & 3) === 1 && ((conf >> (2 * (n - 1)) & 3) === 1) ? 1 : 0)
+
+computeTable(11, cycleScore);
+
 function scoreFnForLemma26(conf: number): number {
-  const score = scoreFn(conf, 6);
+  const score = standardScore(conf, 6);
   const u0 = conf & 3;
   const u0prime = (conf >> 12) & 3;
   return score + (u0 === 1 && u0prime === 1 ? 1 : 0);
 }
 
-export class BreakerStrategy {
+export interface IStrategy {
+  breakerMove(prevMove: number): number;
+}
+
+export class PathBreakerStrategy implements IStrategy {
   size: number;
   baseTable: Uint8Array;
   lemma26Table: Uint8Array;
   lemma26Games: number[]
   baseGame: number;
 
-  constructor(n: number) {
+  constructor(n: number, withBorder: boolean = false) {
     this.size = n;
     this.lemma26Games = [];
     while (n > 5) {
       this.lemma26Games.push(0);
       n -= 5;
     }
-    this.baseTable = computeTable(n, scoreFn);
+    this.baseTable = computeTable(n, withBorder ? scoreWithLeftBorder : standardScore);
     this.lemma26Table = computeTable(7, scoreFnForLemma26);
     this.baseGame = 0;
   }
@@ -121,7 +134,29 @@ export class BreakerStrategy {
   }
 }
 
-let strat =  new BreakerStrategy(7);
+export class CycleBreakerStrategy implements IStrategy {
+  size: number;
+  pathStrat: PathBreakerStrategy;
+  firstMove: number | null;
+
+  constructor(n: number) {
+    this.size = n;
+    this.pathStrat = new PathBreakerStrategy(n - 2, true);
+    this.firstMove = null;
+  }
+
+  breakerMove(prevMove: number): number {
+    if (this.firstMove === null) {
+      this.firstMove = prevMove;
+      return (prevMove + this.size - 1) % this.size;
+    } else {
+      const move = this.pathStrat.breakerMove((prevMove - this.firstMove - 1 + this.size) % this.size);
+      return (move + this.firstMove + 1) % this.size;
+    }
+  }
+}
+/*
+let strat =  new PathBreakerStrategy(7);
 let m1 = strat.breakerMove(1);
 console.log("answer to 1, m1 =", m1);
 let m2 = strat.breakerMove(0);
@@ -130,3 +165,4 @@ let m3 = strat.breakerMove(5);
 console.log("answer to 5, m3 =", m3);
 let m4 = strat.breakerMove(3);
 console.log("answer to 3, m4 =", m4);
+*/

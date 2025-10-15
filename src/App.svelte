@@ -2,7 +2,7 @@
   import { RotateCcw } from '@lucide/svelte';
   import type { Edge, Graph, Strategy, Variant } from "./types";
   import { countBy, delay, generate, generate2, maximaBy, randomPick, range, repeat } from "./util";
-  import { BreakerStrategy } from "./strategy";
+  import { type IStrategy, PathBreakerStrategy, CycleBreakerStrategy } from "./strategy";
   import Menubar from "./components/Menubar.svelte";
   import Button from "./components/Button.svelte";
   import Info from "./components/Info.svelte";
@@ -122,16 +122,18 @@
 
   let position = $derived(repeat(nodeCount, 0));
 
-  let strategyObj: BreakerStrategy | null = $derived(
-    graph !== "path" || variant !== "maker" || strategy !== "optimal"
+  let strategyObj: IStrategy | null = $derived(
+    graph !== "path" && graph !== "cycle" || variant !== "maker" || strategy !== "optimal"
     ? null
-    : new BreakerStrategy(nodeCount)
+    : graph === "path"
+    ? new PathBreakerStrategy(nodeCount)
+    : new CycleBreakerStrategy(nodeCount) // cycle
   )
 
   let restart = async () => {
     if (strategy === "pairing" && (variant === "breaker" || graph !== "path" && graph !== "cycle")
       || strategy === "degree" && graph === "hypergraph"
-      || strategy === "optimal" && graph !== "path"
+      || strategy === "optimal" && graph !== "path" && graph !== "cycle"
     ) {
       strategy = "random";
     }
