@@ -33,13 +33,6 @@
       Un chemin est une suite de sommets où chaque sommet (sauf les extrémités) 
       est connecté à deux autres sommets.
     </p>
-    {#if variant !== "makermaker"}
-      <p>
-        Une stratégie optimale en temps polynomial existe pour cette classe de graphes.
-        Le score si les deux joueurs jouent parfaitement est asymptotiquement égal à
-        <math><mfrac><mi>n</mi><mn>5</mn></mfrac></math>.
-      </p>
-    {/if}
   {:else if graph === "cycle"}
     <p>
       Un cycle est un graphe où chaque sommet est connecté à deux autres sommets, formant une boucle fermée.
@@ -66,12 +59,6 @@
       Se joue sur une grille triangulaire. Le but est de récupérer les triangles
       (hyperarêtes) au lieu des arêtes.
     </p>
-    {#if variant !== "makermaker"}
-      <p>Le score si les deux joueurs jouent parfaitement est compris entre
-        <math><mrow><mo>⌊</mo><mfrac><mi>n</mi><mn>28</mn></mfrac><mo>⌋</mo></mrow></math> et
-        <math><mrow><mo>⌈</mo><mfrac><mi>n</mi><mn>8</mn></mfrac><mo>⌉</mo></mrow></math>.
-      </p>
-    {/if}
   {/if}
   <h3>Stratégie</h3>
   {#if strategy === "random"}
@@ -98,6 +85,17 @@
       <math><mrow><mo>⌈</mo><mfrac><mi>n</mi><mn>4</mn></mfrac><mo>⌉</mo></mrow></math>
       sur les cycles.
     </p>
+  {:else if strategy === "optimal"}
+    {#if graph === "path"}
+      <p>
+        Il existe une stratégie optimale en temps polynomial pour la variante Maker/Breaker sur les chemins.
+        Le score optimal pour un chemin à n sommets est
+        <math><mrow><mo>⌊</mo><mfrac><mrow><mi>n</mi><mo>+</mo><mn>2</mn></mrow><mn>5</mn></mfrac><mo>⌋</mo></mrow></math>
+        si Maker commence et
+        <math><mrow><mo>⌊</mo><mfrac><mrow><mi>n</mi><mo>-</mo><mn>1</mn></mrow><mn>5</mn></mfrac><mo>⌋</mo></mrow></math>
+        si Breaker commence.
+      </p>
+    {/if}
   {/if}
 </aside>
 
