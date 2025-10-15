@@ -122,13 +122,15 @@
 
   let position = $derived(repeat(nodeCount, 0));
 
-  let strategyObj: IStrategy | null = $derived(
+  const mkStrategy = (): IStrategy | null =>
     graph !== "path" && graph !== "cycle" || variant !== "maker" || strategy !== "optimal"
     ? null
     : graph === "path"
     ? new PathBreakerStrategy(nodeCount)
     : new CycleBreakerStrategy(nodeCount) // cycle
-  )
+
+
+  let strategyObj = $derived.by(mkStrategy);
 
   let restart = async () => {
     if (strategy === "pairing" && (variant === "breaker" || graph !== "path" && graph !== "cycle")
@@ -139,6 +141,7 @@
     }
 
     position = repeat(nodeCount, 0);
+    strategyObj = mkStrategy();
     //turn = 1;
     if (variant !== "breaker") {
       showStrat = false;
