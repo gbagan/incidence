@@ -8,9 +8,6 @@
   };
   
   let { variant, graph, strategy }: Props = $props();
-
-  $inspect(strategy);
-
 </script>
 
 <aside class="info">

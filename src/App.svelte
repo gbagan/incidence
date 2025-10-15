@@ -218,6 +218,9 @@
 
   const computerMove = (prevMove: number | null): number | null => {
     const n = position.length;
+    if (position.every(x => x !== 0)) {
+      return null;
+    }
     switch (strategy) {
       case "random":
         return randomPick(range(0, n).filter(i => position[i] === 0));

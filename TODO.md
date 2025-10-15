@@ -6,5 +6,5 @@
 - [ ] Coups optimaux pour Maker sur cycle
 - [ ] Finir la partie quand aucun coup ne rapporte des points
 - [ ] Graphe avec des degrés variés
-- [ ] Ne pas autoriser la machine à jouer si la partie est finie
-- [ ] Bug: la machine écrase parfois un coup en mode cycle / breaker même si la partie n'est pas finie. 
+- [x] Ne pas autoriser la machine à jouer si la partie est finie
+- [x] Bug: la machine écrase parfois un coup en mode cycle / breaker même si la partie n'est pas finie. 

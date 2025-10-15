@@ -44,7 +44,6 @@ const computeTable = (n: number, scoreFn: (conf: number, n: number) => number) =
   }
 
   backtrack(0, 0);
-  console.log(score_table[0]);
   return move_table;
 }
 
@@ -64,8 +63,6 @@ const scoreWithLeftBorder = (conf: number, n: number)  =>
 
 const cycleScore = (conf: number, n: number)  =>
   standardScore(conf, n) + ((conf & 3) === 1 && ((conf >> (2 * (n - 1)) & 3) === 1) ? 1 : 0)
-
-computeTable(11, cycleScore);
 
 function scoreFnForLemma26(conf: number): number {
   const score = standardScore(conf, 6);
@@ -100,9 +97,13 @@ export class PathBreakerStrategy implements IStrategy {
   breakerMove(prevMove: number, depth: number = 0): number {
     const n = this.size - 5 * depth;
     const m = n - 6;
+    //console.log("breakerMove called with prevMove =", prevMove, "depth =", depth, "n =", n, "m =", m, "baseGame =", this.baseGame.toString(4));
     if (n <= 5) {
       this.baseGame |= 1 << (2 * prevMove);
       const move = this.baseTable[this.baseGame];
+      if (move === 255) {
+          console.log("0: No move found for game =", this.baseGame.toString(4), "at depth", depth);
+        }
       this.baseGame |= 2 << (2 * move);
       return move;
     } else if (prevMove < m) {
@@ -114,6 +115,9 @@ export class PathBreakerStrategy implements IStrategy {
         let game = this.lemma26Games[depth];
         game |= 1 << (2 * 6);
         const answer = this.lemma26Table[game];
+        if (move === 255) {
+          console.log("1: No move found for game =", game.toString(4), "at depth", depth);
+        }
         game |= 2 << (2 * answer);
         this.lemma26Games[depth] = game;
         return answer + m;
@@ -123,10 +127,14 @@ export class PathBreakerStrategy implements IStrategy {
       let game = this.lemma26Games[depth]
       game |= 1 << (2 * (prevMove - m));
       const move = this.lemma26Table[game];
+      if (move === 255) {
+        console.log("2: No move found for game =", game.toString(4), "at depth", depth);
+      }
       game |= 2 << (2 * move);
       this.lemma26Games[depth] = game;
       if (move === 6) { // u0'
-        return this.breakerMove(m, depth+1)
+        //console.log("lemma 26, answer on u0', depth = ", depth, "m=", m, "game =", game.toString(4));
+        return this.breakerMove(m, depth)
       } else {
         return move + m;
       }
