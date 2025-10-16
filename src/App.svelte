@@ -2,7 +2,7 @@
   import { RotateCcw } from '@lucide/svelte';
   import type { Edge, Graph, Strategy, Variant } from "./types";
   import { countBy, delay, generate, generate2, maximaBy, randomPick, range, repeat } from "./util";
-  import { type IStrategy, PathBreakerStrategy, CycleBreakerStrategy } from "./strategy";
+  import { type IStrategy, PathBreakerStrategy, CycleBreakerStrategy, PathMakerStrategy } from "./strategy";
   import Menubar from "./components/Menubar.svelte";
   import Button from "./components/Button.svelte";
   import Info from "./components/Info.svelte";
@@ -123,12 +123,15 @@
   let position = $derived(repeat(nodeCount, 0));
 
   const mkStrategy = (): IStrategy | null =>
-    graph !== "path" && graph !== "cycle" || variant !== "maker" || strategy !== "optimal"
+    graph !== "path" && graph !== "cycle" || variant === "makermaker" || strategy !== "optimal"
     ? null
-    : graph === "path"
+    : graph === "path" && variant === "maker"
     ? new PathBreakerStrategy(nodeCount)
-    : new CycleBreakerStrategy(nodeCount) // cycle
-
+    : graph === "path"
+    ? new PathMakerStrategy() // path
+    : variant === "breaker"
+    ? new CycleBreakerStrategy(nodeCount) // cycle
+    : null;
 
   let strategyObj = $derived.by(mkStrategy);
 
@@ -156,7 +159,6 @@
     }
 
   }
-
 
   let score1 = $derived(countBy(wsets, (set => set.every(x => position[x] === 1))));
   let score2 = $derived(countBy(wsets, (set => set.every(x => position[x] === 2))));
@@ -217,6 +219,7 @@
   });
 
   const computerMove = (prevMove: number | null): number | null => {
+    console.log("computerMove called with strategy =", strategy, "prevMove =", prevMove);
     const n = position.length;
     if (position.every(x => x !== 0)) {
       return null;
@@ -251,10 +254,7 @@
         }
         return randomPick(range(0, n).filter(i => position[i] === 0));
       case "optimal":
-        if (prevMove === null) { // todo
-          return null;
-        }
-        return strategyObj?.breakerMove(prevMove) ?? null
+        return strategyObj?.move(position, prevMove) ?? null
     }
   }
 

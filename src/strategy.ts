@@ -1,4 +1,6 @@
-const computeTable = (n: number, scoreFn: (conf: number, n: number) => number) => {
+import { randomPick, range } from './util';
+
+const computeTable = (n: number, scoreFn: (conf: number, n: number) => number, whoStarts = 0) => {
   const score_table = new Uint8Array(3 << (2 * (n-1)));
   score_table.fill(255);
   const move_table = new Uint8Array(3 << (2 * (n-1)));
@@ -10,7 +12,7 @@ const computeTable = (n: number, scoreFn: (conf: number, n: number) => number) =
     } else if (depth === n) {
       const score = score_table[conf] = scoreFn(conf, n);
       return score;
-    } else if ((depth & 1) === 0) { // maker plays
+    } else if (((depth + whoStarts) & 1) === 0) { // maker plays
       let best = 0;
       let bestMove = 255;
       for (let i = 0; i < n; i++) {
@@ -44,6 +46,10 @@ const computeTable = (n: number, scoreFn: (conf: number, n: number) => number) =
   }
 
   backtrack(0, 0);
+  //let s = score_table[0];
+  //let moves = range(0, n).filter(i => score_table[1 << (2 * i)] === s);
+  //console.log(`n=${n}, initial score = ${s}, whoStarts = ${whoStarts}`);
+
   return move_table;
 }
 
@@ -61,8 +67,18 @@ function standardScore(conf: number, n: number): number {
 const scoreWithLeftBorder = (conf: number, n: number)  =>
   standardScore(conf, n) + (((conf & 3) === 1) ? 1 : 0);
 
-const cycleScore = (conf: number, n: number)  =>
-  standardScore(conf, n) + ((conf & 3) === 1 && ((conf >> (2 * (n - 1)) & 3) === 1) ? 1 : 0)
+//const scoreWithBothBorders = (conf: number, n: number)  =>
+//  standardScore(conf, n) + (((conf & 3) === 1) ? 1 : 0) + (((conf >> (2 * (n - 1)) & 3) === 1) ? 1 : 0);
+
+/*
+for (let n = 1; n <= 15; n++) {
+  computeTable(n, standardScore);
+  computeTable(n, standardScore, 1);
+}
+*/
+
+//const cycleScore = (conf: number, n: number)  =>
+//  standardScore(conf, n) + ((conf & 3) === 1 && ((conf >> (2 * (n - 1)) & 3) === 1) ? 1 : 0)
 
 function scoreFnForLemma26(conf: number): number {
   const score = standardScore(conf, 6);
@@ -72,8 +88,63 @@ function scoreFnForLemma26(conf: number): number {
 }
 
 export interface IStrategy {
-  breakerMove(prevMove: number): number;
+  move(board: number[], prevMove: number | null): number;
 }
+
+export class PathMakerStrategy implements IStrategy {
+  move(board: number[], _prevMove: number | null): number {
+    const segments: [number, number][] = [];
+    let start: null | number = null;
+    for (let i = 0; i < board.length; i++) {
+      if (board[i] === 0) {
+        if (start === null) {
+          start = i;
+        }
+      } else if (start !== null) {
+        segments.push([start, i-1]);
+        start = null;
+      }
+    }
+    if (start !== null) {
+      segments.push([start, board.length - 1]);
+    }
+
+    const makerHasLeftBorder = ([l, _]: [number, number]) => l > 0 && board[l-1] === 1;
+    const makerHasRightBorder = ([_, r]: [number, number]) => r < board.length - 1 && board[r+1] === 1;
+
+    const veryNiceSegments = segments.filter(s =>
+      makerHasLeftBorder(s) && makerHasRightBorder(s) && s[0] === s[1]
+    );
+    if (veryNiceSegments.length > 0) {
+      return randomPick(veryNiceSegments)![0];
+    }
+
+    const niceSegments = segments.filter(s => {
+      const size = s[1] - s[0] + 1;
+      const left = makerHasLeftBorder(s);
+      const right = makerHasRightBorder(s);
+      return (
+        left && right
+        ? size >= 3 && size % 5 !== 1
+        : left || right
+        ? size % 5 !== 4
+        : [3, 4, 5].includes(size % 5) 
+      )
+    });
+    if (niceSegments.length > 0) {
+      const segment = randomPick(niceSegments)!;
+      if (makerHasLeftBorder(segment)) {
+        return segment[0];
+      } else if (makerHasRightBorder(segment)) {
+        return segment[1];
+      } else {
+        return segment[0] + 1;
+      }
+    }
+    return randomPick(range(0, board.length).filter(i => board[i] === 0))!;
+  }
+}
+
 
 export class PathBreakerStrategy implements IStrategy {
   size: number;
@@ -94,7 +165,7 @@ export class PathBreakerStrategy implements IStrategy {
     this.baseGame = 0;
   }
 
-  breakerMove(prevMove: number, depth: number = 0): number {
+  move(board: number[], prevMove: number, depth: number = 0): number {
     const n = this.size - 5 * depth;
     const m = n - 6;
     //console.log("breakerMove called with prevMove =", prevMove, "depth =", depth, "n =", n, "m =", m, "baseGame =", this.baseGame.toString(4));
@@ -107,7 +178,7 @@ export class PathBreakerStrategy implements IStrategy {
       this.baseGame |= 2 << (2 * move);
       return move;
     } else if (prevMove < m) {
-      const move = this.breakerMove(prevMove, depth+1);
+      const move = this.move(board, prevMove, depth+1);
       if (move < m) {
         return move;
       } else {
@@ -134,7 +205,7 @@ export class PathBreakerStrategy implements IStrategy {
       this.lemma26Games[depth] = game;
       if (move === 6) { // u0'
         //console.log("lemma 26, answer on u0', depth = ", depth, "m=", m, "game =", game.toString(4));
-        return this.breakerMove(m, depth)
+        return this.move(board, m, depth)
       } else {
         return move + m;
       }
@@ -153,12 +224,12 @@ export class CycleBreakerStrategy implements IStrategy {
     this.firstMove = null;
   }
 
-  breakerMove(prevMove: number): number {
+  move(board: number[], prevMove: number): number {
     if (this.firstMove === null) {
       this.firstMove = prevMove;
       return (prevMove + this.size - 1) % this.size;
     } else {
-      const move = this.pathStrat.breakerMove((prevMove - this.firstMove - 1 + this.size) % this.size);
+      const move = this.pathStrat.move(board, (prevMove - this.firstMove - 1 + this.size) % this.size);
       return (move + this.firstMove + 1) % this.size;
     }
   }

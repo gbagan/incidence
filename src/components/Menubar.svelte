@@ -47,7 +47,7 @@
       ["random", false],
       ["erdos", false],
       ["pairing", variant === "breaker" || graph !== "path" && graph !== "cycle"],
-      ["optimal", variant !== "maker" || graph !== "path" && graph !== "cycle"],
+      ["optimal", graph !== "path" && graph !== "cycle"],
     ]
   );
 </script>
