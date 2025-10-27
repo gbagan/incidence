@@ -1,5 +1,56 @@
 import { randomPick, range } from './util';
 
+export interface IStrategy {
+  move(board: number[], prevMove: number | null): number;
+}
+
+export class RandomStrategy implements IStrategy {
+  move(board: number[], _prevMove: number | null): number {
+    const availableMoves = range(0, board.length).filter(i => board[i] === 0);
+    return randomPick(availableMoves)!;
+  }
+}
+
+export class PairingStrategy implements IStrategy {
+  move(board: number[], prevMove: number): number {
+    let nextMove = prevMove ^ 1;
+    if (board[nextMove] === 0) {
+      return nextMove;
+    } else {
+      const availableMoves = range(0, board.length).filter(i => board[i] === 0);
+      return randomPick(availableMoves)!;
+    }
+  }
+}
+
+export class ErdosStrategy implements IStrategy {
+  #scores: () => readonly number[];
+
+  constructor(scores: () => readonly number[]) {
+    this.#scores = scores;
+  }
+
+  move(_board: number[], _prevMove: number): number {
+    const scores = this.#scores();
+    const n = scores.length;
+    const max = Math.max(...scores);
+    return randomPick(range(0, n).filter(x => scores[x] === max))!;
+  }
+}
+
+export class DegreeStrategy implements IStrategy {
+  #maxdegrees: () => readonly number[];
+
+  constructor(maxdegrees: () => readonly number[]) {
+    this.#maxdegrees = maxdegrees;
+  }
+
+  move(_board: number[], _prevMove: number): number {
+    return randomPick(this.#maxdegrees())!;
+  }
+}
+
+
 const computeTable = (n: number, scoreFn: (conf: number, n: number) => number, whoStarts = 0) => {
   const score_table = new Uint8Array(3 << (2 * (n-1)));
   score_table.fill(255);
@@ -46,9 +97,9 @@ const computeTable = (n: number, scoreFn: (conf: number, n: number) => number, w
   }
 
   backtrack(0, 0);
-  //let s = score_table[0];
-  //let moves = range(0, n).filter(i => score_table[1 << (2 * i)] === s);
-  //console.log(`n=${n}, initial score = ${s}, whoStarts = ${whoStarts}`);
+  let s = score_table[0];
+  let moves = range(0, n).filter(i => score_table[1 << (2 * i)] === s);
+  console.log(`score = ${s}, moves = ${moves}`);
 
   return move_table;
 }
@@ -67,13 +118,35 @@ function standardScore(conf: number, n: number): number {
 const scoreWithLeftBorder = (conf: number, n: number)  =>
   standardScore(conf, n) + (((conf & 3) === 1) ? 1 : 0);
 
-//const scoreWithBothBorders = (conf: number, n: number)  =>
-//  standardScore(conf, n) + (((conf & 3) === 1) ? 1 : 0) + (((conf >> (2 * (n - 1)) & 3) === 1) ? 1 : 0);
+const scoreWithTwoBorders = (conf: number, n: number)  =>
+  standardScore(conf, n) + (((conf & 3) === 1) ? 1 : 0) + (((conf >> (2 * (n - 1)) & 3) === 1) ? 1 : 0);
 
 /*
-for (let n = 1; n <= 15; n++) {
-  computeTable(n, standardScore);
-  computeTable(n, standardScore, 1);
+for (let n = 1; n <= 14; n++) {
+  console.log("n =", n);
+  computeTable(n+1, scoreWithLeftBorderAndDirective, 0);
+  computeTable(n, scoreWithLeftBorder, 1);
+}
+*/
+
+function scoreWithTwoBordersAndDirective(conf: number, n: number): number {
+  const directive = (conf >> (2 * (n-1)) & 3) === 1
+  return scoreWithTwoBorders(conf, n - 1) + (directive ? 1 : 0);
+}
+
+function scoreWithLeftBorderAndDirective(conf: number, n: number): number {
+  const directive = (conf >> (2 * (n-1)) & 3) === 1
+  return scoreWithLeftBorder(conf, n - 1) + (directive ? 1 : 0);
+}
+
+function standardScoreWithDirective(conf: number, n: number): number {
+  const directive = (conf >> (2 * (n-1)) & 3) === 1
+  return standardScoreWithDirective(conf, n - 1) + (directive ? 1 : 0);
+}
+
+/*
+for (let i = 2; i <= 15; i++) {
+  computeTable(i, scoreWithTwoBordersAndDirective);
 }
 */
 
@@ -85,10 +158,6 @@ function scoreFnForLemma26(conf: number): number {
   const u0 = conf & 3;
   const u0prime = (conf >> 12) & 3;
   return score + (u0 === 1 && u0prime === 1 ? 1 : 0);
-}
-
-export interface IStrategy {
-  move(board: number[], prevMove: number | null): number;
 }
 
 export class PathMakerStrategy implements IStrategy {

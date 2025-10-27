@@ -1,8 +1,10 @@
 <script lang="ts">
   import { RotateCcw } from '@lucide/svelte';
   import type { Edge, Graph, Strategy, Variant } from "./types";
-  import { countBy, delay, generate, generate2, maximaBy, randomPick, range, repeat } from "./util";
-  import { type IStrategy, PathBreakerStrategy, CycleBreakerStrategy, PathMakerStrategy } from "./strategy";
+  import { countBy, delay, generate, generate2, maximaBy, range, repeat } from "./util";
+  import { type IStrategy, PathBreakerStrategy, CycleBreakerStrategy,
+      PathMakerStrategy, RandomStrategy, PairingStrategy, ErdosStrategy,
+      DegreeStrategy } from "./strategy";
   import Menubar from "./components/Menubar.svelte";
   import Button from "./components/Button.svelte";
   import Info from "./components/Info.svelte";
@@ -123,14 +125,20 @@
   let position = $derived(repeat(nodeCount, 0));
 
   const mkStrategy = (): IStrategy | null =>
-    graph !== "path" && graph !== "cycle" || variant === "makermaker" || strategy !== "optimal"
-    ? null
-    : graph === "path" && variant === "maker"
+    strategy === "random"
+    ? new RandomStrategy()
+    : strategy === "erdos"
+    ? new ErdosStrategy(() => erdosScores!)
+    : strategy === "degree"
+    ? new DegreeStrategy(() => maxDegrees!)
+    : strategy === "pairing"
+    ? new PairingStrategy()
+    : graph === "path" && variant === "maker" && strategy === "optimal"
     ? new PathBreakerStrategy(nodeCount)
-    : graph === "path"
+    : graph === "path" && variant === "breaker" && strategy === "optimal"
     ? new PathMakerStrategy() // path
-    : variant === "breaker"
-    ? new CycleBreakerStrategy(nodeCount) // cycle
+    : graph === "cycle" && variant === "breaker" && strategy === "optimal"
+    ? new CycleBreakerStrategy(nodeCount)
     : null;
 
   let strategyObj = $derived.by(mkStrategy);
@@ -219,43 +227,10 @@
   });
 
   const computerMove = (prevMove: number | null): number | null => {
-    console.log("computerMove called with strategy =", strategy, "prevMove =", prevMove);
-    const n = position.length;
     if (position.every(x => x !== 0)) {
       return null;
     }
-    switch (strategy) {
-      case "random":
-        return randomPick(range(0, n).filter(i => position[i] === 0));
-      case "degree":
-        if (maxDegrees === null) {
-          return null;
-        }
-        return randomPick(maxDegrees);
-      case "erdos":
-        if (erdosScores === null) {
-          return null;
-        }
-        let max = Math.max(...erdosScores);
-        if (max === -Infinity) {
-          return null;
-        }
-        return randomPick(range(0, n).filter(x => erdosScores[x] === max));
-      case "pairing":
-        if (pairing === null) {
-          return null;
-        }
-        for (const [u, v] of pairing) {
-          if (prevMove === u) {
-            return v;
-          } else if (prevMove === v) {
-            return u;
-          }
-        }
-        return randomPick(range(0, n).filter(i => position[i] === 0));
-      case "optimal":
-        return strategyObj?.move(position, prevMove) ?? null
-    }
+    return strategyObj?.move(position, prevMove) ?? null
   }
 
   const play = async (i: number) => {
