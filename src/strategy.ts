@@ -303,14 +303,3 @@ export class CycleBreakerStrategy implements IStrategy {
     }
   }
 }
-/*
-let strat =  new PathBreakerStrategy(7);
-let m1 = strat.breakerMove(1);
-console.log("answer to 1, m1 =", m1);
-let m2 = strat.breakerMove(0);
-console.log("answer to 0, m2 =", m2);
-let m3 = strat.breakerMove(5);
-console.log("answer to 5, m3 =", m3);
-let m4 = strat.breakerMove(3);
-console.log("answer to 3, m4 =", m4);
-*/
