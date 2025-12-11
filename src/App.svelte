@@ -18,6 +18,7 @@
 
   let sizeLimit = $derived.by(() => {
     switch (graph) {
+      case "confluence": return { rowMin: 1, rowMax: 1, colMin: 12, colMax: 12 };
       case "path":
       case "cycle": return { rowMin: 1, rowMax: 1, colMin: 5, colMax: 30 };
       case "grid": return { rowMin: 2, rowMax: 8, colMin: 2, colMax: 8 };
@@ -32,6 +33,7 @@
 
   let rowCount = $derived.by(() => {
     switch (graph) {
+      case "confluence":
       case "path":
       case "cycle": return 1;
       case "grid": return 8;
@@ -42,6 +44,7 @@
 
   let colCount = $derived.by(() => {
     switch (graph) {
+      case "confluence": return 12;
       case "path":
       case "cycle": return 18;
       case "grid":
@@ -54,6 +57,21 @@
 
   let nodes: {x: number, y: number}[] = $derived.by(() => {
     switch (graph) {
+      case "confluence":
+        return [
+          {y: 0.41285714285714287, x: 0.3447857230050223},
+          {y: 0.5842857142857143, x: 0.2333571515764509},
+          {y: 0.5814285714285714, x: 0.049071437290736604},
+          {y: 0.3628571428571429, x: 0.05192858014787947},
+          {y: 0.5385714285714286, x: 0.8076428658621652},
+          {y: 0.5985714285714285, x: 0.660500008719308},
+          {y: 0.40714285714285714, x: 0.5247857230050224},
+          {y: 0.5928571428571429, x: 0.5433571515764509},
+          {y: 0.9285714285714286, x: 0.5347857230050224},
+          {y: 0.4642857142857143, x: 0.9590714372907366},
+          {y: 0.9014285714285715, x: 0.22050000871930803},
+          {y: 0.11571428571428571, x: 0.6762142944335937},
+        ].map(({x, y}) => ({ x: 600 * x, y: 600 * y})) 
       case "path":
         return generate(nodeCount, i => ({
           x: i < 8 ? 50 + i * 60 : i < 16 ? 530 : 50 + (23 - i) * 60,
@@ -71,12 +89,13 @@
       case "triangle":
       case "hypergraph":
         const h = Math.sqrt(3) / 2;
-        return generate2(10, 8, (row, col) => ({x: (row % 2 === 0 ? 20 : 55) + 70 * col, y: 20 + 70 * h * row}));
+        return generate2(rowCount, colCount, (row, col) => ({x: (row % 2 === 0 ? 20 : 55) + 70 * col, y: 20 + 70 * h * row}));
     }
   })
 
   const edges: [number, number][] = $derived.by(() => {
     switch (graph) {
+      case "confluence": return [[1,0], [1,3], [6,0], [7,6], [9,11], [5,11], [11,0], [3,11], [9,6], [8,9], [4,5], [9,4], [1,7], [10,1], [8,10], [7,8], [10,6], [2,3], [10,2], [8,5]];
       case "path": return generate(nodeCount - 1, i => [i, i + 1]);
       case "cycle": return generate(nodeCount, i => [i, (i+1) % nodeCount]);
       case "grid": return [
@@ -86,12 +105,12 @@
       case "triangle":
       case "hypergraph":
         return [
-        ...generate2(10, 7, (i, j) => [8 * i + j, 8 * i + j + 1] as Edge),
-        ...generate2(9, 8, (i, j) => [8 * i + j, 8 * i + j + 8] as Edge),
-        ...generate2(9, 7, (i, j) =>
+        ...generate2(rowCount, colCount-1, (i, j) => [colCount * i + j, colCount * i + j + 1] as Edge),
+        ...generate2(rowCount-1, colCount, (i, j) => [colCount * i + j, colCount * i + j + colCount] as Edge),
+        ...generate2(rowCount-1, colCount-1, (i, j) =>
           i % 2 === 0 
-          ? [8 * i + j + 1, 8 * i + j + 8] as Edge
-          : [8 * i + j, 8 * i + j + 9] as Edge
+          ? [colCount * i + j + 1, colCount * i + j + colCount] as Edge
+          : [colCount * i + j, colCount * i + j + colCount+1] as Edge
         )
       ];
     }

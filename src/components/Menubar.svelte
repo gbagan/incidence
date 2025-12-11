@@ -29,14 +29,15 @@
     : "Optimale";
 
   const graphText = (graph: Graph) =>
-    graph === "path" ? "Chemin"
+    graph === "confluence" ? "Confluence"
+    : graph === "path" ? "Chemin"
     : graph === "cycle" ? "Cycle"
     : graph === "grid" ? "Grille"
     : graph === "triangle" ? "Triangulaire"
     : "Hypergraphe";
 
   const variants:  Variant[] = ["makermaker", "maker", "breaker"];
-  const graphs: Graph[] = ["path", "cycle", "grid", "triangle", "hypergraph"];
+  const graphs: Graph[] = ["confluence", "path", "cycle", "grid", "triangle", "hypergraph"];
   
   const strategies: [Strategy, boolean][]  = $derived(
     variant === "makermaker"
