@@ -75,7 +75,9 @@
     <p>Elle n'est pas nécessairement optimale sur les hypergraphes.</p>
   {:else if strategy === "erdos"}
     <p>
-      Cette stratégie est basée sur le théorème d'<strong>Erdős-Selfridge</strong>. todo.
+      Cette stratégie est basée sur le théorème d'<strong>Erdős-Selfridge</strong>.
+      Celui donne un score de danger sur chaque sommet du graphe.
+      L'algorithme joue sur le sommet ayant le score le plus élevé.
     </p>
   {:else if strategy === "pairing"}
     <p>
