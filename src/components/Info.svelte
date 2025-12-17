@@ -28,7 +28,9 @@
     </p>
   {/if}
   <h3>Graphe</h3>
-  {#if graph === "path"}
+  {#if graph === "confluence"}
+    <p>Le graphe du quartier de Confluence.</p>
+  {:else if graph === "path"}
     <p>
       Un chemin est une suite de sommets où chaque sommet (sauf les extrémités) 
       est connecté à deux autres sommets.
